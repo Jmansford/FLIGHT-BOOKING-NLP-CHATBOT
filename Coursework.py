@@ -1,6 +1,6 @@
 import random
 import re
-from nltk import word_tokenize
+from nltk import word_tokenize, ngrams
 from datetime import datetime
 
 # Identity management
@@ -19,26 +19,34 @@ def preprocess_input(user_input):
     user_input = user_input.replace("\n", " ")
     # Tokenize input
     tokens = word_tokenize(user_input)
-    # Join tokens back into a processed string
-    processed_input = " ".join(tokens)
-    return processed_input
+    return tokens
 
-# Intent Matching
+# Intent Matching with N-Grams
 def match_intent(user_input):
-    user_input = preprocess_input(user_input)
-    if re.search(r'\bbook\b|\bflight\b|\btravel\b|\breserve\b|\bticket\b', user_input, re.IGNORECASE):
+    tokens = preprocess_input(user_input)
+
+    # Create bigrams and trigrams from tokens
+    bigrams = list(ngrams(tokens, 2))
+    trigrams = list(ngrams(tokens, 3))
+
+    # Convert bigrams and trigrams to sets of strings for easier comparison
+    bigram_strings = {" ".join(bigram) for bigram in bigrams}
+    trigram_strings = {" ".join(trigram) for trigram in trigrams}
+
+    # Check for intents based on tokens, bigrams, and trigrams
+    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket'}):
         return "booking"
-    elif re.search(r'\bhello\b|\bhi\b|\bhey\b|\bgreetings\b|\bhowdy\b', user_input, re.IGNORECASE):
+    elif set(tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}):
         return "greeting"
-    elif re.search(r'\bthank\b|\bthanks\b|\bthank you\b|\bappreciate\b', user_input, re.IGNORECASE):
+    elif set(tokens).intersection({'thank', 'thanks', 'appreciate'}):
         return "thanks"
-    elif re.search(r'\bbye\b|\bgoodbye\b|\bsee you\b|\blater\b|\bquit\b|\bexit\b', user_input, re.IGNORECASE):
+    elif set(tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit'}):
         return "farewell"
-    elif re.search(r'\bhow are you\b|\bhows it going\b|\bhow do you do\b|\bwhats up\b', user_input, re.IGNORECASE):
+    elif set(tokens).intersection({'how', 'are', 'you'}) or bigram_strings.intersection({'how are', 'whats up'}) or trigram_strings.intersection({'how is it', 'how do you'}):
         return "how_are_you"
-    elif re.search(r'\bwhat can you do\b|\bhelp\b|\babilities\b|\bfunctions\b', user_input, re.IGNORECASE):
+    elif set(tokens).intersection({'what', 'can', 'you', 'do', 'help', 'abilities', 'functions'}):
         return "capabilities"
-    elif re.search(r'\bwhat is my name\b|\bwho am i\b|\bdo you know my name\b', user_input, re.IGNORECASE):
+    elif set(tokens).intersection({'what', 'is', 'my', 'name', 'who', 'am', 'i'}):
         return "user_name"
     else:
         return "unknown"
