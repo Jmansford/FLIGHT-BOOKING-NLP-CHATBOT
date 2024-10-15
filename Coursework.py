@@ -79,13 +79,16 @@ def parse_date(input_date, reference_date=None):
             return None
 
 # Booking Flow
-def booking_flow():
-    origin = input("Bot: Where are you flying from? ")
-    destination = input("Bot: Where are you flying to? ")
+def booking_flow(name):
+    print("Bot: Where are you flying from?")
+    origin = input(f"{name}: ")
+    print("Bot: Where are you flying to?")
+    destination = input(f"{name}: ")
     
     # Handle departure date input
     while True:
-        departure_date = input("Bot: What is your departure date? (e.g., 15-11-2024, tomorrow, in 3 days) ")
+        print("Bot: What is your departure date? (e.g., 15-11-2024, tomorrow, in 3 days)")
+        departure_date = input(f"{name}: ")
         departure_date_obj = parse_date(departure_date)
         if departure_date_obj:
             break
@@ -93,7 +96,8 @@ def booking_flow():
             print("Bot: That doesn't seem like a valid date. Please try again.")
     
     # Handle return date input
-    return_date = input("Bot: What is your return date? (e.g., one-way, 5 days later, one week later) ")
+    print("Bot: What is your return date? (e.g., one-way, 5 days later, one week later)")
+    return_date = input(f"{name}: ")
     if return_date.lower() != 'one-way':
         return_date_obj = parse_date(return_date, reference_date=departure_date_obj)
         if not return_date_obj:
@@ -102,7 +106,8 @@ def booking_flow():
     else:
         return_date_obj = None
 
-    travel_class = input("Bot: What class would you like to travel in? (economy, business, first) ")
+    print("Bot: What class would you like to travel in? (economy, business, first)")
+    travel_class = input(f"{name}: ")
     while travel_class.lower() not in ['economy', 'business', 'first']:
         travel_class = input("Bot: Please choose a valid class (economy, business, first): ")
     
@@ -111,7 +116,7 @@ def booking_flow():
         print(f"Bot: The return date is {return_date_obj.strftime('%d-%m-%Y')}.")
     # Simulate flight search
     print("Bot: I found a few options for you. Do you want me to book one? (yes/no)")
-    confirm = input("You: ")
+    confirm = input(f"{name}: ")
     if confirm.lower() in ['yes', 'y']:
         print("Bot: Your flight has been booked successfully!")
     else:
@@ -129,7 +134,7 @@ def chatbot():
         if intent == "greeting":
             print(f"Bot: Hello {name}, how can I assist you today?")
         elif intent == "booking":
-            booking_flow()
+            booking_flow(name)
         elif intent == "thanks":
             print("Bot: You're welcome! Happy to help.")
         elif intent == "farewell":
