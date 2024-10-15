@@ -1,6 +1,7 @@
 import random
 import re
 from nltk import word_tokenize
+from datetime import datetime
 
 # Identity management
 def get_user_name():
@@ -10,7 +11,7 @@ def get_user_name():
 
 # Intent Matching
 def match_intent(user_input):
-    user_input = re.sub(r"[\'\.,!\?]", "", user_input.lower())
+    user_input = re.sub(r"['\.,!?]", "", user_input.lower())
     if re.search(r'\bbook\b|\bflight\b|\btravel\b|\breserve\b|\bticket\b', user_input, re.IGNORECASE):
         return "booking"
     elif re.search(r'\bhello\b|\bhi\b|\bhey\b|\bgreetings\b|\bhowdy\b', user_input, re.IGNORECASE):
@@ -32,9 +33,29 @@ def match_intent(user_input):
 def booking_flow():
     origin = input("Bot: Where are you flying from? ")
     destination = input("Bot: Where are you flying to? ")
-    departure_date = input("Bot: What is your departure date? (e.g., 2024-11-15) ")
+    
+    # Handle date input with error checking
+    while True:
+        departure_date = input("Bot: What is your departure date? (e.g., 15-11-2024) ")
+        try:
+            departure_date_obj = datetime.strptime(departure_date, '%d-%m-%Y')
+            break
+        except ValueError:
+            print("Bot: That doesn't seem like a valid date format. Please enter it in DD-MM-YYYY format.")
+    
     return_date = input("Bot: What is your return date? (or type 'one-way' for a one-way trip) ")
-    print(f"Bot: Let me check available flights from {origin} to {destination} on {departure_date}.")
+    if return_date.lower() != 'one-way':
+        try:
+            return_date_obj = datetime.strptime(return_date, '%d-%m-%Y')
+        except ValueError:
+            print("Bot: That doesn't seem like a valid date format. Defaulting to 'one-way'.")
+            return_date = 'one-way'
+
+    travel_class = input("Bot: What class would you like to travel in? (economy, business, first) ")
+    while travel_class.lower() not in ['economy', 'business', 'first']:
+        travel_class = input("Bot: Please choose a valid class (economy, business, first): ")
+    
+    print(f"Bot: Let me check available flights from {origin} to {destination} on {departure_date} in {travel_class} class.")
     # Simulate flight search
     print("Bot: I found a few options for you. Do you want me to book one? (yes/no)")
     confirm = input("You: ")
