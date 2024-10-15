@@ -1,7 +1,7 @@
 import random
 import re
 from nltk import word_tokenize, ngrams
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Identity management
 def get_user_name():
@@ -34,7 +34,7 @@ def match_intent(user_input):
     trigram_strings = {" ".join(trigram) for trigram in trigrams}
 
     # Check for intents based on tokens, bigrams, and trigrams
-    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
+    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
         return "booking"
     elif set(tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
         return "greeting"
@@ -56,28 +56,56 @@ def booking_flow():
     origin = input("Bot: Where are you flying from? ")
     destination = input("Bot: Where are you flying to? ")
     
-    # Handle date input with error checking
+    # Handle date input with natural language support using standard library
     while True:
-        departure_date = input("Bot: What is your departure date? (e.g., 15-11-2024) ")
-        try:
-            departure_date_obj = datetime.strptime(departure_date, '%d-%m-%Y')
+        departure_date = input("Bot: What is your departure date? (e.g., 15-11-2024, tomorrow, in 3 days) ")
+        departure_date = departure_date.lower()
+        if departure_date == "tomorrow":
+            departure_date_obj = datetime.now() + timedelta(days=1)
             break
-        except ValueError:
-            print("Bot: That doesn't seem like a valid date format. Please enter it in DD-MM-YYYY format.")
+        elif "in" in departure_date and "day" in departure_date:
+            try:
+                days = int(re.search(r"\d+", departure_date).group())
+                departure_date_obj = datetime.now() + timedelta(days=days)
+                break
+            except AttributeError:
+                print("Bot: That doesn't seem like a valid date. Please try again.")
+        elif "next week" in departure_date:
+            departure_date_obj = datetime.now() + timedelta(weeks=1)
+            break
+        else:
+            try:
+                departure_date_obj = datetime.strptime(departure_date, '%d-%m-%Y')
+                break
+            except ValueError:
+                print("Bot: That doesn't seem like a valid date. Please try again.")
     
     return_date = input("Bot: What is your return date? (or type 'one-way' for a one-way trip) ")
     if return_date.lower() != 'one-way':
-        try:
-            return_date_obj = datetime.strptime(return_date, '%d-%m-%Y')
-        except ValueError:
-            print("Bot: That doesn't seem like a valid date format. Defaulting to 'one-way'.")
-            return_date = 'one-way'
+        return_date = return_date.lower()
+        if return_date == "tomorrow":
+            return_date_obj = datetime.now() + timedelta(days=1)
+        elif "in" in return_date and "day" in return_date:
+            try:
+                days = int(re.search(r"\d+", return_date).group())
+                return_date_obj = datetime.now() + timedelta(days=days)
+            except AttributeError:
+                print("Bot: That doesn't seem like a valid date. Defaulting to 'one-way'.")
+                return_date = 'one-way'
+        elif "next week" in return_date:
+            return_date_obj = datetime.now() + timedelta(weeks=1)
+        else:
+            try:
+                return_date_obj = datetime.strptime(return_date, '%d-%m-%Y')
+            except ValueError:
+                print("Bot: That doesn't seem like a valid date. Defaulting to 'one-way'.")
+                return_date = 'one-way'
 
     travel_class = input("Bot: What class would you like to travel in? (economy, business, first) ")
     while travel_class.lower() not in ['economy', 'business', 'first']:
         travel_class = input("Bot: Please choose a valid class (economy, business, first): ")
     
-    print(f"Bot: Let me check available flights from {origin} to {destination} on {departure_date} in {travel_class} class.")
+    print(f"Bot: Let me check available flights from {origin} to {destination} on {departure_date_obj.strftime('%d-%m-%Y')} in {travel_class} class.")
     # Simulate flight search
     print("Bot: I found a few options for you. Do you want me to book one? (yes/no)")
     confirm = input("You: ")
