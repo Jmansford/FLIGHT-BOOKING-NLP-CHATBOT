@@ -34,19 +34,19 @@ def match_intent(user_input):
     trigram_strings = {" ".join(trigram) for trigram in trigrams}
 
     # Check for intents based on tokens, bigrams, and trigrams
-    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket'}):
+    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
         return "booking"
-    elif set(tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}):
+    elif set(tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
         return "greeting"
-    elif set(tokens).intersection({'thank', 'thanks', 'appreciate'}):
+    elif set(tokens).intersection({'thank', 'thanks', 'appreciate'}) or bigram_strings.intersection({'thank you', 'much appreciated'}):
         return "thanks"
-    elif set(tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit'}):
+    elif set(tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit'}) or bigram_strings.intersection({'see you', 'goodbye bot'}) or trigram_strings.intersection({'talk to you later', 'see you soon'}):
         return "farewell"
-    elif set(tokens).intersection({'how', 'are', 'you'}) or bigram_strings.intersection({'how are', 'whats up'}) or trigram_strings.intersection({'how is it', 'how do you'}):
+    elif bigram_strings.intersection({'how are', 'whats up'}) or trigram_strings.intersection({'how is it', 'how do you'}):
         return "how_are_you"
-    elif set(tokens).intersection({'what', 'can', 'you', 'do', 'help', 'abilities', 'functions'}):
+    elif bigram_strings.intersection({'what can', 'help me'}) or trigram_strings.intersection({'what can you', 'how can you'}):
         return "capabilities"
-    elif set(tokens).intersection({'what', 'is', 'my', 'name', 'who', 'am', 'i'}):
+    elif set(tokens).intersection({'what', 'is', 'my', 'name', 'who', 'am', 'i'}) or bigram_strings.intersection({'my name', 'who am'}) or trigram_strings.intersection({'what is my', 'do you know my'}):
         return "user_name"
     else:
         return "unknown"
