@@ -9,9 +9,23 @@ def get_user_name():
     print(f"Bot: Nice to meet you, {name}!")
     return name
 
+# Pre-processing user input
+def preprocess_input(user_input):
+    # Convert to lowercase
+    user_input = user_input.lower()
+    # Remove punctuation
+    user_input = re.sub(r"['\.,!?]", "", user_input)
+    # Remove newline characters
+    user_input = user_input.replace("\n", " ")
+    # Tokenize input
+    tokens = word_tokenize(user_input)
+    # Join tokens back into a processed string
+    processed_input = " ".join(tokens)
+    return processed_input
+
 # Intent Matching
 def match_intent(user_input):
-    user_input = re.sub(r"['\.,!?]", "", user_input.lower())
+    user_input = preprocess_input(user_input)
     if re.search(r'\bbook\b|\bflight\b|\btravel\b|\breserve\b|\bticket\b', user_input, re.IGNORECASE):
         return "booking"
     elif re.search(r'\bhello\b|\bhi\b|\bhey\b|\bgreetings\b|\bhowdy\b', user_input, re.IGNORECASE):
