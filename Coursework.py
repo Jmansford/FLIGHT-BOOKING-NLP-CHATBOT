@@ -15,14 +15,10 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 nltk.download('punkt')
 
-
 # Identity management
 def get_user_name():
     print("Bot: Hi, let's get started with your name: ")
-    name = input("Enter your name: ")
-    print(f"Bot: Nice to meet you, {name}!")
-    return name
-
+    return input("Enter your name: ")
 
 lemmatizer = WordNetLemmatizer()
 
@@ -63,8 +59,6 @@ def match_intent(user_input):
     if 'how' in tokens and 'be' in tokens and 'you' in tokens:
         return 'how_are_you'
     
-    tokens = preprocess_input(user_input)
-
     # Create bigrams and trigrams from tokens
     bigrams = list(ngrams(tokens, 2))
     trigrams = list(ngrams(tokens, 3))
@@ -74,15 +68,19 @@ def match_intent(user_input):
     trigram_strings = {" ".join(trigram) for trigram in trigrams}
 
     # Define synonym expansion dictionary
+    synonym_cache = {}
+
     def get_synonyms(word):
+        if word in synonym_cache:
+            return synonym_cache[word]
         synonyms = []
         for syn in wordnet.synsets(word):
             for lemma in syn.lemmas():
                 synonyms.append(lemma.name())
-        # Remove duplicates and the original word
         synonyms = list(set(synonyms))
         if word in synonyms:
             synonyms.remove(word)
+        synonym_cache[word] = synonyms
         return synonyms
 
     # Expand tokens with synonyms dynamically using WordNet
@@ -252,7 +250,7 @@ def chatbot():
         elif intent == "booking":
             booking_flow(name)
         elif intent == "thanks":
-            print(random.choice(["Bot: You're welcome! Happy to help.", "Bot: No problem at all!", "Bot: Glad I could assist!", "Bot: Anytime, {name}!"]))
+            print(random.choice(["Bot: You're welcome! Happy to help.", "Bot: No problem at all!", "Bot: Glad I could assist!", f"Bot: Anytime, {name}!"]))
         elif intent == "farewell":
             print(random.choice([f"Bot: Goodbye {name}, have a great day!", f"Bot: Bye {name}, take care!", f"Bot: See you later, {name}!", f"Bot: Farewell, {name}! Stay safe."]))
             break
