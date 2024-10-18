@@ -1,19 +1,20 @@
+# Imports
 import random
 import re
+import nltk
+
 from nltk import word_tokenize, ngrams
 from nltk.corpus import stopwords
 from datetime import datetime, timedelta
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
 
-# Download stopwords from nltk if not already available
-import nltk
+# Downloads
+nltk.download('wordnet')
+nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Pre-processing user input
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
-nltk.download('wordnet')
-nltk.download('averaged_perceptron_tagger')
 
 # Identity management
 def get_user_name():
