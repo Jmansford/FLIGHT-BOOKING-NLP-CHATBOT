@@ -15,6 +15,99 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 nltk.download('punkt')
 
+# Response dictionary for variations
+responses = {
+    "origin": [
+        "Got it, you're flying from {origin}.",
+        "Okay, I have your origin as {origin}.",
+        "Noted, departing from {origin}."
+    ],
+    "destination": [
+        "Great, you're flying to {destination}.",
+        "Destination set to {destination}.",
+        "Got it, flying to {destination}."
+    ],
+    "departure_date": [
+        "Your departure date is set to {departure_date}.",
+        "Departure date noted as {departure_date}.",
+        "Okay, leaving on {departure_date}."
+    ],
+    "return_date": [
+        "Return date set to {return_date}.",
+        "Got it, returning on {return_date}.",
+        "Return date noted as {return_date}."
+    ],
+    "travel_class": [
+        "Travel class set to {travel_class}.",
+        "Noted, {travel_class} class.",
+        "{travel_class.capitalize()} class selected. Let me see what's available."
+    ],
+    "greeting": [
+        "Hello {name}, how can I assist you today?",
+        "Hi {name}! What can I do for you today?",
+        "Hey {name}, how can I help you?",
+        "Greetings {name}, what do you need today?"
+    ],
+    "thanks": [
+        "You're welcome! Happy to help.",
+        "No problem at all!",
+        "Glad I could assist!",
+        "Anytime, {name}!"
+    ],
+    "farewell": [
+        "Goodbye {name}, have a great day!",
+        "Bye {name}, take care!",
+        "See you later, {name}!",
+        "Farewell, {name}! Stay safe."
+    ],
+    "how_are_you": [
+        "I'm good, but I'm here to help you!",
+        "I'm doing great, thanks for asking! How can I assist you?",
+        "I don't have feelings, but I'm ready to help you!",
+        "I'm here and ready to assist you!"
+    ],
+    "capabilities": [
+        "I can help you book a flight, tell you your name, and answer simple questions.",
+        "I can assist with booking flights, reminding you of your name, and answering basic questions.",
+        "I can book flights, tell you your name, or answer simple queries.",
+        "Booking flights, answering questions, and keeping track of your name is what I do best!"
+    ],
+    "user_name": [
+        "Your name is {name}.",
+        "You told me your name is {name}.",
+        "If I remember correctly, your name is {name}.",
+        "You're {name}, right?"
+    ],
+    "one_way": [
+        "You have selected a one-way trip.",
+        "Noted, this is a one-way trip.",
+        "One-way trip confirmed."
+    ],
+    "flight_check": [
+        "Let me check available flights from {origin} to {destination} on {departure_date} in {travel_class} class.",
+        "Checking flights from {origin} to {destination} on {departure_date} in {travel_class} class.",
+        "Let me find flights for you from {origin} to {destination} on {departure_date} in {travel_class} class."
+    ],
+    "booking_confirmed": [
+        "Your flight has been booked successfully!",
+        "All done! Your flight is booked.",
+        "Great! Your flight is confirmed and booked."
+    ]
+}
+
+# Get a random response based on the intent and optional parameters
+# Parameters:
+#   intent: str - The intent or scenario for which a response is needed, used to fetch responses from the responses dictionary.
+#   name: str (optional) - The user's name, used to personalize the response if applicable.
+#   **kwargs: dict (optional) - Additional variables to format into the response, such as origin, destination, or dates.
+def get_response(intent, name=None, **kwargs):
+    response = random.choice(responses[intent])
+    if name:
+        response = response.format(name=name)
+    if kwargs:
+        response = response.format(**kwargs)
+    return f"Bot: {response}"
+
 # Identity management
 def get_user_name():
     print("Bot: Hi, let's get started with your name: ")
@@ -171,7 +264,7 @@ def booking_flow(name):
         location = extract_location(user_input)
         if location:
             booking_details["origin"] = location
-            print(random.choice([f"Bot: Got it, you're flying from {booking_details['origin']}.", f"Bot: Okay, I have your origin as {booking_details['origin']}.", f"Bot: Noted, departing from {booking_details['origin']}."]))
+            print(get_response("origin", origin=booking_details['origin']))
         else:
             print("Bot: I couldn't understand the origin. Please try again.")
     
@@ -182,7 +275,7 @@ def booking_flow(name):
         location = extract_location(user_input)
         if location:
             booking_details["destination"] = location
-            print(random.choice([f"Bot: Great, you're flying to {booking_details['destination']}.", f"Bot: Destination set to {booking_details['destination']}.", f"Bot: Got it, flying to {booking_details['destination']}."]))
+            print(get_response("destination", destination=booking_details['destination']))
         else:
             print("Bot: I couldn't understand the destination. Please try again.")
     
@@ -193,7 +286,7 @@ def booking_flow(name):
         departure_date_obj = parse_date(user_input)
         if departure_date_obj:
             booking_details["departure_date"] = departure_date_obj
-            print(random.choice([f"Bot: Your departure date is set to {booking_details['departure_date'].strftime('%d-%m-%Y')}.", f"Bot: Departure date noted as {booking_details['departure_date'].strftime('%d-%m-%Y')}.", f"Bot: Okay, leaving on {booking_details['departure_date'].strftime('%d-%m-%Y')}."]))
+            print(get_response("departure_date", departure_date=booking_details['departure_date'].strftime('%d-%m-%Y')))
         else:
             print("Bot: That doesn't seem like a valid date. Please try again.")
     
@@ -208,7 +301,7 @@ def booking_flow(name):
             return_date_obj = parse_date(user_input, reference_date=booking_details.get("departure_date"))
             if return_date_obj:
                 booking_details["return_date"] = return_date_obj
-                print(random.choice([f"Bot: Return date set to {booking_details['return_date'].strftime('%d-%m-%Y')}.", f"Bot: Got it, returning on {booking_details['return_date'].strftime('%d-%m-%Y')}.", f"Bot: Return date noted as {booking_details['return_date'].strftime('%d-%m-%Y')}."]))
+                print(get_response("return_date", return_date=booking_details['return_date'].strftime('%d-%m-%Y')))
             else:
                 print("Bot: That doesn't seem like a valid date. Please try again or say 'one-way'.")
     
@@ -219,20 +312,16 @@ def booking_flow(name):
         travel_class = user_input.lower()
         if travel_class in ['economy', 'business', 'first']:
             booking_details["travel_class"] = travel_class
-            print(random.choice([f"Bot: Travel class set to {booking_details['travel_class']}.", f"Bot: Noted, {booking_details['travel_class']} class.", f"Bot: {booking_details['travel_class'].capitalize()} class selected. Let me see what's available."]))
+            print(get_response("travel_class", travel_class=booking_details['travel_class']))
         else:
             print("Bot: Please choose a valid class (economy, business, first).")
     
     # Once all booking details are collected
-    print(random.choice([
-        f"Bot: Let me check available flights from {booking_details['origin']} to {booking_details['destination']} on {booking_details['departure_date'].strftime('%d-%m-%Y')} in {booking_details['travel_class']} class.",
-        f"Bot: Checking flights from {booking_details['origin']} to {booking_details['destination']} on {booking_details['departure_date'].strftime('%d-%m-%Y')} in {booking_details['travel_class']} class.",
-        f"Bot: Let me find flights for you from {booking_details['origin']} to {booking_details['destination']} on {booking_details['departure_date'].strftime('%d-%m-%Y')} in {booking_details['travel_class']} class."
-    ]))
+    print(get_response("flight_check", origin=booking_details['origin'], destination=booking_details['destination'], departure_date=booking_details['departure_date'].strftime('%d-%m-%Y'), travel_class=booking_details['travel_class']))
     print("Bot: I found a flight for you, would you like to confirm the booking?")
     confirm = input(f"{name}: ")
     if confirm.lower() in ['yes', 'y']:
-        print(random.choice(["Bot: Your flight has been booked successfully!", "Bot: All done! Your flight is booked.", "Bot: Great! Your flight is confirmed and booked."]))
+        print(get_response("booking_confirmed"))
     else:
         print("Bot: No problem, let me know if you need anything else.")
 
@@ -246,20 +335,20 @@ def chatbot():
         intent = match_intent(user_input)
         
         if intent == "greeting":
-            print(random.choice([f"Bot: Hello {name}, how can I assist you today?", f"Bot: Hi {name}! What can I do for you today?", f"Bot: Hey {name}, how can I help you?", f"Bot: Greetings {name}, what do you need today?"]))
+            print(get_response("greeting", name=name))
         elif intent == "booking":
             booking_flow(name)
         elif intent == "thanks":
-            print(random.choice(["Bot: You're welcome! Happy to help.", "Bot: No problem at all!", "Bot: Glad I could assist!", f"Bot: Anytime, {name}!"]))
+            print(get_response("thanks", name=name))
         elif intent == "farewell":
-            print(random.choice([f"Bot: Goodbye {name}, have a great day!", f"Bot: Bye {name}, take care!", f"Bot: See you later, {name}!", f"Bot: Farewell, {name}! Stay safe."]))
+            print(get_response("farewell", name=name))
             break
         elif intent == "how_are_you":
-            print(random.choice(["Bot: I'm just a bot, but I'm here to help you!", "Bot: I'm doing great, thanks for asking! How can I assist you?", "Bot: I don't have feelings, but I'm ready to help you!", "Bot: I'm here and ready to assist you!"]))
+            print(get_response("how_are_you"))
         elif intent == "capabilities":
-            print(random.choice(["Bot: I can help you book a flight, tell you your name, and answer simple questions.", "Bot: I can assist with booking flights, reminding you of your name, and answering basic questions.", "Bot: I can book flights, tell you your name, or answer simple queries.", "Bot: Booking flights, answering questions, and keeping track of your name is what I do best!"]))
+            print(get_response("capabilities"))
         elif intent == "user_name":
-            print(random.choice([f"Bot: Your name is {name}.", f"Bot: You told me your name is {name}.", f"Bot: If I remember correctly, your name is {name}.", f"Bot: You're {name}, right?"]))
+            print(get_response("user_name", name=name))
         else:
             print("Bot: I'm not sure I understand. Could you please clarify?")
 
