@@ -9,18 +9,19 @@ import nltk
 nltk.download('stopwords')
 nltk.download('punkt')
 
-# Identity management
-def get_user_name():
-    print("Bot: Hi, let's get started with your name: ")
-    name = input()
-    print(f"Bot: Nice to meet you, {name}!")
-    return name
-
 # Pre-processing user input
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
+
+# Identity management
+def get_user_name():
+    print("Bot: Hi, let's get started with your name: ")
+    name = input("Enter your name: ")
+    print(f"Bot: Nice to meet you, {name}!")
+    return name
+
 
 lemmatizer = WordNetLemmatizer()
 
