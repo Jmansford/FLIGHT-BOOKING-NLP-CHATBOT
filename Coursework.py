@@ -57,6 +57,12 @@ def preprocess_input(user_input):
 def match_intent(user_input):
     tokens = preprocess_input(user_input)
 
+    # Match based on lemmatized tokens for common phrases
+    if 'how' in tokens and 'be' in tokens and 'you' in tokens:
+        return 'how_are_you'
+    
+    tokens = preprocess_input(user_input)
+
     # Create bigrams and trigrams from tokens
     bigrams = list(ngrams(tokens, 2))
     trigrams = list(ngrams(tokens, 3))
@@ -66,34 +72,38 @@ def match_intent(user_input):
     trigram_strings = {" ".join(trigram) for trigram in trigrams}
 
     # Define synonym expansion dictionary
-    synonym_dict = {
-        "book": ["reserve", "schedule"],
-        "flight": ["ticket", "air travel"],
-        "travel": ["journey", "trip"],
-        "hello": ["hi", "hey", "greetings"],
-        "goodbye": ["bye", "farewell", "see you"]
-    }
+    def get_synonyms(word):
+        synonyms = []
+        for syn in wordnet.synsets(word):
+            for lemma in syn.lemmas():
+                synonyms.append(lemma.name())
+        # Remove duplicates and the original word
+        synonyms = list(set(synonyms))
+        if word in synonyms:
+            synonyms.remove(word)
+        return synonyms
 
-    # Expand tokens with synonyms
+    # Expand tokens with synonyms dynamically using WordNet
     expanded_tokens = set(tokens)
     for token in tokens:
-        if token in synonym_dict:
-            expanded_tokens.update(synonym_dict[token])
+        synonyms = get_synonyms(token)
+        if synonyms:
+            expanded_tokens.update(synonyms)
 
     # Check for intents based on tokens, bigrams, and trigrams
-    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
+    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly', 'journey', 'trip'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
         return "booking"
-    elif set(expanded_tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
+    elif set(expanded_tokens).intersection({'hello', 'hi', 'hey', 'greet', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
         return "greeting"
     elif set(expanded_tokens).intersection({'thank', 'thanks', 'appreciate'}) or bigram_strings.intersection({'thank you', 'much appreciated'}):
         return "thanks"
-    elif set(expanded_tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit'}) or bigram_strings.intersection({'see you', 'goodbye bot'}) or trigram_strings.intersection({'talk to you later', 'see you soon'}):
+    elif set(expanded_tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit', 'farewell'}) or bigram_strings.intersection({'see you', 'goodbye bot'}) or trigram_strings.intersection({'talk to you later', 'see you soon'}):
         return "farewell"
-    elif bigram_strings.intersection({'how are', 'whats up'}) or trigram_strings.intersection({'how is it', 'how do you'}):
+    elif 'how are you' in user_input or 'how are' in bigram_strings or 'whats up' in bigram_strings or 'how is it' in trigram_strings or 'how do you' in trigram_strings:
         return "how_are_you"
-    elif bigram_strings.intersection({'what can', 'help me'}) or trigram_strings.intersection({'what can you', 'how can you'}):
+    elif bigram_strings.intersection({'what can', 'help me', 'ask help'}) or trigram_strings.intersection({'what can you', 'how can you', 'could you help'}):
         return "capabilities"
-    elif set(tokens).intersection({'what', 'is', 'my', 'name', 'who', 'am', 'i'}) or bigram_strings.intersection({'my name', 'who am'}) or trigram_strings.intersection({'what is my', 'do you know my'}):
+    elif set(tokens).intersection({'what', 'be', 'my', 'name', 'who', 'i'}) or bigram_strings.intersection({'my name', 'who be'}) or trigram_strings.intersection({'what is my', 'do you know my'}):
         return "user_name"
     else:
         # Fallback logic using expanded tokens if no direct match is found
