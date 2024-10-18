@@ -21,7 +21,7 @@ def preprocess_input(user_input):
     tokens = word_tokenize(user_input)
     return tokens
 
-# Intent Matching with N-Grams
+# Intent Matching with N-Grams and Query Expansion
 def match_intent(user_input):
     tokens = preprocess_input(user_input)
 
@@ -33,14 +33,29 @@ def match_intent(user_input):
     bigram_strings = {" ".join(bigram) for bigram in bigrams}
     trigram_strings = {" ".join(trigram) for trigram in trigrams}
 
+    # Define synonym expansion dictionary
+    synonym_dict = {
+        "book": ["reserve", "schedule"],
+        "flight": ["ticket", "air travel"],
+        "travel": ["journey", "trip"],
+        "hello": ["hi", "hey", "greetings"],
+        "goodbye": ["bye", "farewell", "see you"]
+    }
+
+    # Expand tokens with synonyms
+    expanded_tokens = set(tokens)
+    for token in tokens:
+        if token in synonym_dict:
+            expanded_tokens.update(synonym_dict[token])
+
     # Check for intents based on tokens, bigrams, and trigrams
     if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
         return "booking"
-    elif set(tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
+    elif set(expanded_tokens).intersection({'hello', 'hi', 'hey', 'greetings', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
         return "greeting"
-    elif set(tokens).intersection({'thank', 'thanks', 'appreciate'}) or bigram_strings.intersection({'thank you', 'much appreciated'}):
+    elif set(expanded_tokens).intersection({'thank', 'thanks', 'appreciate'}) or bigram_strings.intersection({'thank you', 'much appreciated'}):
         return "thanks"
-    elif set(tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit'}) or bigram_strings.intersection({'see you', 'goodbye bot'}) or trigram_strings.intersection({'talk to you later', 'see you soon'}):
+    elif set(expanded_tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit'}) or bigram_strings.intersection({'see you', 'goodbye bot'}) or trigram_strings.intersection({'talk to you later', 'see you soon'}):
         return "farewell"
     elif bigram_strings.intersection({'how are', 'whats up'}) or trigram_strings.intersection({'how is it', 'how do you'}):
         return "how_are_you"
@@ -49,7 +64,11 @@ def match_intent(user_input):
     elif set(tokens).intersection({'what', 'is', 'my', 'name', 'who', 'am', 'i'}) or bigram_strings.intersection({'my name', 'who am'}) or trigram_strings.intersection({'what is my', 'do you know my'}):
         return "user_name"
     else:
-        return "unknown"
+        # Fallback logic using expanded tokens if no direct match is found
+        if set(expanded_tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly', 'schedule', 'journey', 'trip'}):
+            return "booking"
+        else:
+            return "unknown"
 
 # Date Parsing Function
 def parse_date(input_date, reference_date=None):
@@ -81,14 +100,14 @@ def parse_date(input_date, reference_date=None):
 # Booking Flow
 def booking_flow(name):
     print("Bot: Where are you flying from?")
-    origin = input(f"{name}: ")
+    origin = input(f"\n{name}: ")
     print("Bot: Where are you flying to?")
-    destination = input(f"{name}: ")
+    destination = input(f"\n{name}: ")
     
     # Handle departure date input
     while True:
         print("Bot: What is your departure date? (e.g., 15-11-2024, tomorrow, in 3 days)")
-        departure_date = input(f"{name}: ")
+        departure_date = input(f"\n{name}: ")
         departure_date_obj = parse_date(departure_date)
         if departure_date_obj:
             break
@@ -97,7 +116,7 @@ def booking_flow(name):
     
     # Handle return date input
     print("Bot: What is your return date? (e.g., one-way, 5 days later, one week later)")
-    return_date = input(f"{name}: ")
+    return_date = input(f"\n{name}: ")
     if return_date.lower() != 'one-way':
         return_date_obj = parse_date(return_date, reference_date=departure_date_obj)
         if not return_date_obj:
@@ -107,7 +126,7 @@ def booking_flow(name):
         return_date_obj = None
 
     print("Bot: What class would you like to travel in? (economy, business, first)")
-    travel_class = input(f"{name}: ")
+    travel_class = input(f"\n{name}: ")
     while travel_class.lower() not in ['economy', 'business', 'first']:
         travel_class = input("Bot: Please choose a valid class (economy, business, first): ")
     
@@ -116,7 +135,7 @@ def booking_flow(name):
         print(f"Bot: The return date is {return_date_obj.strftime('%d-%m-%Y')}.")
     # Simulate flight search
     print("Bot: I found a few options for you. Do you want me to book one? (yes/no)")
-    confirm = input(f"{name}: ")
+    confirm = input(f"\n{name}: ")
     if confirm.lower() in ['yes', 'y']:
         print("Bot: Your flight has been booked successfully!")
     else:
