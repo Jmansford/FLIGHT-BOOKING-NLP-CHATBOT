@@ -1,7 +1,13 @@
 import random
 import re
 from nltk import word_tokenize, ngrams
+from nltk.corpus import stopwords
 from datetime import datetime, timedelta
+
+# Download stopwords from nltk if not already available
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
 
 # Identity management
 def get_user_name():
@@ -70,6 +76,19 @@ def match_intent(user_input):
         else:
             return "unknown"
 
+# Extract Location Function
+def extract_location(user_input):
+    tokens = preprocess_input(user_input)
+    stop_words = set(stopwords.words('english'))
+    filtered_tokens = [token for token in tokens if token not in stop_words and token.isalpha()]
+
+    # Heuristic: Assume the last meaningful word is the location
+    if filtered_tokens:
+        return filtered_tokens[-1].capitalize()
+    
+    # Fallback: return the full input as a guess
+    return user_input
+
 # Date Parsing Function
 def parse_date(input_date, reference_date=None):
     input_date = input_date.lower()
@@ -98,41 +117,83 @@ def parse_date(input_date, reference_date=None):
             return None
 
 # Booking Flow
+# User follows a specific order of input during the booking process
 def booking_flow(name):
-    print("Bot: Where are you flying from?")
-    origin = input(f"\n{name}: ")
-    print("Bot: Where are you flying to?")
-    destination = input(f"\n{name}: ")
+    booking_details = {
+        "origin": None,
+        "destination": None,
+        "departure_date": None,
+        "return_date": None,
+        "travel_class": None,
+    }
     
-    # Handle departure date input
-    while True:
-        print("Bot: What is your departure date? (e.g., 15-11-2024, tomorrow, in 3 days)")
-        departure_date = input(f"\n{name}: ")
-        departure_date_obj = parse_date(departure_date)
+    print("Bot: Let's get the details for your flight booking.")
+    
+    # Step 1: Get Origin
+    while not booking_details["origin"]:
+        print(f"Bot: Please provide the origin: ")
+        user_input = input(f"\n{name}: ")
+        location = extract_location(user_input)
+        if location:
+            booking_details["origin"] = location
+            print(f"Bot: Got it, you're flying from {booking_details['origin']}.")
+        else:
+            print("Bot: I couldn't understand the origin. Please try again.")
+    
+    # Step 2: Get Destination
+    while not booking_details["destination"]:
+        print("Bot: Please provide the destination")
+        user_input = input(f"\n{name}: ")
+        location = extract_location(user_input)
+        if location:
+            booking_details["destination"] = location
+            print(f"Bot: Great, you're flying to {booking_details['destination']}.")
+        else:
+            print("Bot: I couldn't understand the destination. Please try again.")
+    
+    # Step 3: Get Departure Date
+    while not booking_details["departure_date"]:
+        print("Bot: When would you like to depart?")
+        user_input = input(f"\n{name}: ")
+        departure_date_obj = parse_date(user_input)
         if departure_date_obj:
-            break
+            booking_details["departure_date"] = departure_date_obj
+            print(f"Bot: Your departure date is set to {booking_details['departure_date'].strftime('%d-%m-%Y')}.")
         else:
             print("Bot: That doesn't seem like a valid date. Please try again.")
     
-    # Handle return date input
-    print("Bot: What is your return date? (e.g., one-way, 5 days later, one week later)")
-    return_date = input(f"\n{name}: ")
-    if return_date.lower() != 'one-way':
-        return_date_obj = parse_date(return_date, reference_date=departure_date_obj)
-        if not return_date_obj:
-            print("Bot: That doesn't seem like a valid date. Defaulting to 'one-way'.")
-            return_date = 'one-way'
-    else:
-        return_date_obj = None
-
-    print("Bot: What class would you like to travel in? (economy, business, first)")
-    travel_class = input(f"\n{name}: ")
-    while travel_class.lower() not in ['economy', 'business', 'first']:
-        travel_class = input("Bot: Please choose a valid class (economy, business, first): ")
+    # Step 4: Get Return Date (Optional)
+    while booking_details["return_date"] is None:
+        print("Bot: Would you like to add a return date? You can say 'one-way' if it's a one-way trip: ")
+        user_input = input(f"\n{name}: ")
+        if user_input.lower() == 'one-way':
+            booking_details["return_date"] = 'one-way'
+            print("Bot: You have selected a one-way trip.")
+        else:
+            return_date_obj = parse_date(user_input, reference_date=booking_details.get("departure_date"))
+            if return_date_obj:
+                booking_details["return_date"] = return_date_obj
+                print(f"Bot: Return date set to {booking_details['return_date'].strftime('%d-%m-%Y')}.")
+            else:
+                print("Bot: That doesn't seem like a valid date. Please try again or say 'one-way'.")
     
-    print(f"Bot: Let me check available flights from {origin} to {destination} on {departure_date_obj.strftime('%d-%m-%Y')} in {travel_class} class.")
-    if return_date_obj:
-        print(f"Bot: The return date is {return_date_obj.strftime('%d-%m-%Y')}.")
+    # Step 5: Get Travel Class
+    while not booking_details["travel_class"]:
+        user_input = input(f"\n{name}: What class would you like to travel in? (economy, business, first): ")
+        travel_class = user_input.lower()
+        if travel_class in ['economy', 'business', 'first']:
+            booking_details["travel_class"] = travel_class
+            print(f"Bot: Travel class set to {booking_details['travel_class']}. Let me check available flights.")
+        else:
+            print("Bot: Please choose a valid class (economy, business, first).")
+    
+    # Once all booking details are collected
+    print(f"Bot: Let me check available flights from {booking_details['origin']} to {booking_details['destination']} on {booking_details['departure_date'].strftime('%d-%m-%Y')} in {booking_details['travel_class']} class.")
+    if booking_details['return_date'] != 'one-way':
+        print(f"Bot: The return date is {booking_details['return_date'].strftime('%d-%m-%Y')}.")
+    else:
+        print("Bot: You have selected a one-way trip.")
+    
     # Simulate flight search
     print("Bot: I found a few options for you. Do you want me to book one? (yes/no)")
     confirm = input(f"\n{name}: ")
