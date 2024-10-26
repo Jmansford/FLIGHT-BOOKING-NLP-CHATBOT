@@ -4,7 +4,6 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import os
 
 # Load and preprocess the QA dataset
 nltk.download('punkt')
@@ -13,11 +12,8 @@ nltk.download('stopwords')
 # Load the QA dataset
 qa_data = pd.read_csv('Deliverable1/qadataset.csv')
 
-# Initialize stop words
+# Initialise stop words
 stop_words = set(stopwords.words('english'))
-
-# Check the working directory to ensure proper file paths
-print(os.getcwd())
 
 # Preprocess questions and answers from the dataset
 def preprocess(text):
