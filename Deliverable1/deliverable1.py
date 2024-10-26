@@ -27,7 +27,7 @@ def preprocess(text):
 
 qa_data['Processed_Question'] = qa_data['Question'].apply(preprocess)
 
-# Initialize TF-IDF Vectorizer and fit it on the questions
+# Initialise TF-IDF Vectorizer and fit it on the questions
 vectorizer = TfidfVectorizer()
 tfidf_matrix = vectorizer.fit_transform(qa_data['Processed_Question'])
 
@@ -45,7 +45,7 @@ def find_answer(question):
     max_similarity_score = similarities[0, max_similarity_index]
     
     # Set a similarity threshold to ensure relevance
-    if max_similarity_score > 0.2:  # Adjust this threshold as needed
+    if max_similarity_score > 0.2:  # Alterable threshold
         return qa_data.iloc[max_similarity_index]['Answer']
     else:
         return "I'm not sure how to answer that."
