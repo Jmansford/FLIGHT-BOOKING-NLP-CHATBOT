@@ -1,15 +1,10 @@
-import pandas as pd
-import nltk
+import pandas as pd, nltk, re
+from nltk import word_tokenize, ngrams
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
+from nltk.corpus import stopwords, wordnet
+from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
-from nltk import ngrams
-import re
 
 lemmatizer = WordNetLemmatizer()
 
@@ -50,7 +45,8 @@ def find_answer(question):
     max_similarity_score = similarities[0, max_similarity_index]
     
     # Set a similarity threshold to ensure relevance
-    if max_similarity_score > 0.6:  # Alterable threshold
+    print("max similarity score: ", max_similarity_score)
+    if max_similarity_score > 0.7:  # Alterable threshold
         return qa_data.iloc[max_similarity_index]['Answer']
     else:
         return None  # Return None if no relevant answer is found
