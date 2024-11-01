@@ -1,0 +1,74 @@
+{
+    "intents": {
+        "booking": [
+            "book a flight",
+            "reserve a ticket",
+            "schedule a journey",
+            "I want to travel",
+            "I need to book a trip",
+            "can you help me find a flight",
+            "I need a flight",
+            "I want to book a flight to London",
+            "can you reserve a flight for me",
+            "I'd like to schedule a flight",
+            "please book a plane ticket",
+            "help me find a flight to New York",
+            "I’m looking to book a flight",
+            "find a flight for me",
+            "book my trip",
+            "I’d like to travel to Paris by flight"
+        ],
+        "greeting": [
+            "hello",
+            "hi there",
+            "greetings",
+            "howdy",
+            "hey",
+            "good morning",
+            "good evening"
+        ],
+        "thanks": [
+            "thank you",
+            "thanks a lot",
+            "much appreciated",
+            "thank you very much",
+            "thanks for your help"
+        ],
+        "farewell": [
+            "goodbye",
+            "see you later",
+            "bye",
+            "take care",
+            "talk to you soon",
+            "I’m leaving now"
+        ],
+        "capabilities": [
+            "what can you do",
+            "how can you help",
+            "what are your features",
+            "tell me your functions",
+            "what can I ask you"
+        ],
+        "user_name": [
+            "what is my name",
+            "do you know my name",
+            "who am I",
+            "can you tell my name",
+            "what do you know about me"
+        ],
+        "how_are_you": [
+            "how are you",
+            "how's it going",
+            "how do you do",
+            "how are things",
+            "are you doing well"
+        ],
+        "weather": [
+            "what's the weather like",
+            "tell me the weather",
+            "how's the weather today",
+            "will it rain today",
+            "what's the forecast"
+        ]
+    }
+}

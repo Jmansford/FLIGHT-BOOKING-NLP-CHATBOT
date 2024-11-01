@@ -1,5 +1,3 @@
-# booking_flow.py
-
 from responses import get_response
 from datetime import datetime, timedelta
 import re

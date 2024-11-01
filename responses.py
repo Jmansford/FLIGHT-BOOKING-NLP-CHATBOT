@@ -1,5 +1,3 @@
-# responses.py
-
 import random
 
 # Response dictionary for variations

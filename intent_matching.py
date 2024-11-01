@@ -1,64 +1,60 @@
-# intent_matching.py
-
-from nltk import ngrams
-from nltk.corpus import wordnet
+import json
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 from preprocessing import preprocess_input
 
-# Intent Matching with N-Grams and Query Expansion
+# Load intents from JSON file
+def load_intents(json_file='intents.json'):
+    # Opens the JSON file containing all intents and associated phrases
+    with open(json_file, 'r') as f:
+        intents_data = json.load(f)
+    # Extracts only the "intents" section to get phrases and their respective intent categories
+    intents = intents_data["intents"]
+    return intents
+
+# Build the term-document matrix and intent labels
+def build_intent_corpus(intents):
+    # corpus will hold all phrases as a list, each representing a sample for an intent
+    # labels will hold corresponding intent labels for each phrase in corpus
+    corpus = []
+    labels = []
+    for intent, phrases in intents.items():
+        # Extend corpus with all phrases under the current intent
+        corpus.extend(phrases)
+        # Append the intent label for each phrase in corpus
+        labels.extend([intent] * len(phrases))
+    return corpus, labels
+
+# Load intents and build corpus from the JSON data
+intents = load_intents()
+corpus, labels = build_intent_corpus(intents)
+
+# Initialise vectoriser and transformer with the corpus (using unigrams, bigrams and trigrams)
+vectorizer = CountVectorizer(ngram_range=(1, 3), stop_words='english')
+# Transform the text data into a term-document matrix
+X_counts = vectorizer.fit_transform(corpus)
+
+# TF-IDF transformation on the feature counts to adjust importance of terms
+tfidf_transformer = TfidfTransformer()
+X_tfidf = tfidf_transformer.fit_transform(X_counts)
+
+# Intent matching function
 def match_intent(user_input):
+    # Preprocess and vectorise user input 
     tokens = preprocess_input(user_input)
-
-    # Match based on lemmatized tokens for common phrases
-    if 'how' in tokens and 'be' in tokens and 'you' in tokens:
-        return 'how_are_you'
-
-    # Create bigrams and trigrams from tokens
-    bigrams = list(ngrams(tokens, 2))
-    trigrams = list(ngrams(tokens, 3))
-
-    # Convert bigrams and trigrams to sets of strings for easier comparison
-    bigram_strings = {" ".join(bigram) for bigram in bigrams}
-    trigram_strings = {" ".join(trigram) for trigram in trigrams}
-
-    # Define synonym expansion dictionary
-    synonym_cache = {}
-
-    def get_synonyms(word):
-        if word in synonym_cache:
-            return synonym_cache[word]
-        synonyms = []
-        for syn in wordnet.synsets(word):
-            for lemma in syn.lemmas():
-                synonyms.append(lemma.name())
-        synonyms = list(set(synonyms))
-        if word in synonyms:
-            synonyms.remove(word)
-        synonym_cache[word] = synonyms
-        return synonyms
-
-    # Expand tokens with synonyms dynamically using WordNet
-    expanded_tokens = set(tokens)
-    for token in tokens:
-        synonyms = get_synonyms(token)
-        if synonyms:
-            expanded_tokens.update(synonyms)
-
-    # Check for intents based on tokens, bigrams, and trigrams
-    if set(tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly', 'journey', 'trip'}) or bigram_strings.intersection({'book flight', 'reserve ticket'}) or trigram_strings.intersection({'i want to book', 'can i reserve'}):
-        return "booking"
-    elif set(expanded_tokens).intersection({'hello', 'hi', 'hey', 'greet', 'howdy'}) or bigram_strings.intersection({'hi there', 'hello bot'}):
-        return "greeting"
-    elif set(expanded_tokens).intersection({'thank', 'thanks', 'appreciate'}) or bigram_strings.intersection({'thank you', 'much appreciated'}):
-        return "thanks"
-    elif set(expanded_tokens).intersection({'bye', 'goodbye', 'see', 'later', 'quit', 'exit', 'farewell'}) or bigram_strings.intersection({'see you', 'goodbye bot'}) or trigram_strings.intersection({'talk to you later', 'see you soon'}):
-        return "farewell"
-    elif bigram_strings.intersection({'what can', 'help me', 'ask help'}) or trigram_strings.intersection({'what can you', 'how can you', 'could you help'}):
-        return "capabilities"
-    elif set(tokens).intersection({'what', 'be', 'my', 'name', 'who', 'i'}) or bigram_strings.intersection({'my name', 'who be'}) or trigram_strings.intersection({'what is my', 'do you know my'}):
-        return "user_name"
-    else:
-        # Fallback logic using expanded tokens if no direct match is found
-        if set(expanded_tokens).intersection({'book', 'flight', 'travel', 'reserve', 'ticket', 'fly', 'schedule', 'journey', 'trip'}):
-            return "booking"
-        else:
-            return "unknown"
+    # Vectorise the processed input using the same TF-IDF transformation the corpus
+    # 'user_input_tfidf' is now in the same vector space as our corpus phrases, ready for comparison
+    user_input_tfidf = tfidf_transformer.transform(vectorizer.transform([" ".join(tokens)]))
+    
+    # Calculate cosine similarity between the vectorized user input and each intent phrase
+    similarities = cosine_similarity(user_input_tfidf, X_tfidf).flatten()
+    # Find the index of the phrase in corpus with the highest similarity to the user input
+    best_match_idx = similarities.argmax()
+    
+    # Apply threshold to determine if a match is confident enough
+    # If the highest similarity score is below the threshold, return "unknown" as intent is unclear
+    if similarities[best_match_idx] < 0.3:  # Adjustable threshold
+        return "unknown"
+    
+    # Return the intent label corresponding to the best match
+    return labels[best_match_idx]

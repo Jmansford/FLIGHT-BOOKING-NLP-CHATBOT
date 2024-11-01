@@ -1,5 +1,3 @@
-# chatbot.py
-
 from responses import get_response
 from intent_matching import match_intent
 from booking_flow import booking_flow
