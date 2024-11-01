@@ -25,7 +25,7 @@ responses = {
     "travel_class": [
         "Travel class set to {travel_class}.",
         "Noted, {travel_class} class.",
-        "{travel_class.capitalize()} class selected. Let me see what's available."
+        "{travel_class} class selected. Let me see what's available."
     ],
     "greeting": [
         "Hello {name}, how can I assist you today?",
@@ -68,10 +68,10 @@ responses = {
         "Noted, this is a one-way trip.",
         "One-way trip confirmed."
     ],
-    "flight_check": [
-        "Let me check available flights from {origin} to {destination} on {departure_date} in {travel_class} class.",
-        "Checking flights from {origin} to {destination} on {departure_date} in {travel_class} class.",
-        "Let me find flights for you from {origin} to {destination} on {departure_date} in {travel_class} class."
+    "booking_confirmed_details": [
+        "Flight successfully booked from {origin} to {destination} on {departure_date} in {travel_class} class.",
+        "I've booked you a flight from {origin} to {destination} on {departure_date} in {travel_class} class.",
+        "All sorted! You're flying from {origin} to {destination} on {departure_date} in {travel_class} class."
     ],
     "booking_confirmed": [
         "Your flight has been booked successfully!",

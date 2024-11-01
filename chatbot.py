@@ -1,6 +1,7 @@
 from responses import get_response
 from intent_matching import match_intent
 from booking_flow import booking_flow
+from database_setup import setup_database  
 
 # Identity management
 def get_user_name():
@@ -9,6 +10,9 @@ def get_user_name():
 
 # Chatbot Main Loop
 def chatbot():
+    # Run the flights database setup once at the beginning
+    setup_database()  
+    
     print("\nBot: Hello! Welcome to the Travel Booking Assistant.")
     name = get_user_name()
     print("Bot: You can ask me to book a flight, say hello, thank me, or say goodbye.")
