@@ -9,7 +9,7 @@ def get_user_name():
 
 # Chatbot Main Loop
 def chatbot():
-    print("Bot: Hello! Welcome to the Travel Booking Assistant.")
+    print("\nBot: Hello! Welcome to the Travel Booking Assistant.")
     name = get_user_name()
     print("Bot: You can ask me to book a flight, say hello, thank me, or say goodbye.")
     while True:
