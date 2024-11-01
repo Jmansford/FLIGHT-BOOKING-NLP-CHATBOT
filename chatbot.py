@@ -1,7 +1,7 @@
-from responses import get_response
-from intent_matching import match_intent
-from booking_flow import booking_flow
-from database_setup import setup_database  
+from Classes.responses import get_response
+from Classes.intent_matching import match_intent
+from Classes.booking_flow import booking_flow
+from Classes.database_setup import setup_database  
 
 # Identity management
 def get_user_name():

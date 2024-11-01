@@ -4,7 +4,7 @@ import random
 
 def setup_database():
     # Connect to the SQLite database (or create it if it doesn't exist)
-    conn = sqlite3.connect('flight_booking.db')
+    conn = sqlite3.connect('Resources/flight_booking.db')
     cursor = conn.cursor()
 
     # Create the flights table if it doesn't exist

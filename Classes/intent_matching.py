@@ -1,11 +1,11 @@
 import json
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from preprocessing import preprocess_input
+from Classes.preprocessing import preprocess_input
 from nltk.corpus import wordnet
 
 # Load intents from JSON file
-def load_intents(json_file='intents.json'):
+def load_intents(json_file='Resources/intents.json'):
     with open(json_file, 'r') as f:
         intents_data = json.load(f)
     intents = intents_data["intents"]

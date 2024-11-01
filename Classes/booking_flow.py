@@ -1,13 +1,13 @@
 import sqlite3
-from responses import get_response
+from Classes.responses import get_response
 from datetime import datetime, timedelta
 import re
-from preprocessing import preprocess_input
+from Classes.preprocessing import preprocess_input
 from nltk.corpus import stopwords
 
 # Connect to SQLite database
 def connect_to_db():
-    return sqlite3.connect('flight_booking.db')
+    return sqlite3.connect('Resources/flight_booking.db')
 
 # Extract Location Function
 def extract_location(user_input):
