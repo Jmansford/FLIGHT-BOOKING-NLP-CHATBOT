@@ -30,7 +30,7 @@ def setup_database():
         origins = ["London", "Toronto", "Sydney", "Dubai", "Frankfurt", "Mumbai"]
         destinations = ["Paris", "New York", "Berlin", "Singapore", "Tokyo", "Amsterdam"]
         travel_classes = ["economy", "business", "first"]
-        base_price = 100  # Base price for economy, add more for other classes
+        base_price = 100  # Base price for economy
 
         # Create flight data for the next 30 days with variation
         for destination in destinations:
