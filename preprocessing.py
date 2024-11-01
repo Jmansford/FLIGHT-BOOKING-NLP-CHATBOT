@@ -1,15 +1,11 @@
-# preprocessing.py
-
 import re
 import nltk
 from nltk import word_tokenize
-from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
-nltk.download('stopwords')
 nltk.download('punkt')
 
 lemmatizer = WordNetLemmatizer()
