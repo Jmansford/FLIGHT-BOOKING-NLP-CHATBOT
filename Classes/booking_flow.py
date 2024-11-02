@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import re
 from Classes.preprocessing import preprocess_input
 from nltk.corpus import stopwords
+from nltk.metrics import edit_distance
 
 # List of available origins and destinations
 ORIGINS = ["London", "Toronto", "Sydney", "Dubai", "Frankfurt", "Mumbai"]
@@ -13,14 +14,37 @@ DESTINATIONS = ["Paris", "New York", "Berlin", "Singapore", "Tokyo", "Amsterdam"
 def connect_to_db():
     return sqlite3.connect('Resources/flight_booking.db')
 
-# Helper function to extract location from user input
-def extract_location(user_input):
+# Function to find the best matching location from a list based on user input
+def best_match_location(user_input, location_list):
+    # Preprocess the user input
     tokens = preprocess_input(user_input)
-    stop_words = set(stopwords.words('english'))
-    # Filter out stop words and join remaining tokens to handle multi-word locations
-    filtered_tokens = [token for token in tokens if token not in stop_words and token.isalpha()]
-    return ' '.join(filtered_tokens).title() if filtered_tokens else user_input
+    
+    # Filter out non-alphabetic tokens and capitalise each token to standardise for comparison
+    filtered_tokens = [token.capitalize() for token in tokens if token.isalpha()]
+    
+    # Join tokens to handle multi-word locations (e.g., "New York")
+    location = ' '.join(filtered_tokens)
+    
+    # Find the closest match in location_list based on edit distance (Levenshtein distance)
+    best_match = min(location_list, key=lambda x: edit_distance(location, x))
+    
+    # Return the best match if its edit distance to the input is within the allowed threshold
+    return best_match if edit_distance(location, best_match) <= 3 else None  
 
+# Primary function to extract the location from user input, using both origin and destination lists
+def extract_location(user_input):
+    # Check if user input matches any available origin location
+    origin_match = best_match_location(user_input, ORIGINS)
+    if origin_match:
+        return origin_match  # Return the origin match if found
+    
+    # Check if user input matches any available destination location
+    destination_match = best_match_location(user_input, DESTINATIONS)
+    if destination_match:
+        return destination_match  # Return the destination match if found
+    
+    # Return None if no suitable match is found within the threshold
+    return None
 
 # Helper function to parse dates from user input
 def parse_date(input_date, reference_date=None):
