@@ -23,22 +23,17 @@ def best_match_location(user_input, location_list, max_distance=3):
 
 # Parse booking details from user input with enhanced origin/destination handling
 def parse_booking_details(user_input, booking_details):
-    # Ensure all keys are initialized
     details = {
         "origin": booking_details.get("origin"),
         "destination": booking_details.get("destination"),
         "departure_date": booking_details.get("departure_date"),
         "return_date": booking_details.get("return_date"),
         "travel_class": booking_details.get("travel_class"),
-        "is_flexible": booking_details.get("is_flexible", False)
     }
 
     # Tokenize and POS tag user input
     tokens = word_tokenize(user_input)
     pos_tags = pos_tag(tokens)
-
-    # Determine flexibility from input
-    details["is_flexible"] = "flexible" in user_input.lower() or details["is_flexible"]
 
     # Extract travel class
     if not details["travel_class"]:
@@ -62,9 +57,9 @@ def parse_booking_details(user_input, booking_details):
             potential_destination = tokens[to_index]
             details["destination"] = best_match_location(potential_destination, DESTINATIONS) or details["destination"]
 
-    # Use general POS tagging as backup if "from" and "to" are not used
+    # Use POS tagging as backup if "from" and "to" are not used
     if not details["origin"] or not details["destination"]:
-        for i, (word, tag) in enumerate(pos_tags):
+        for word, tag in pos_tags:
             potential_location = word.capitalize()
             if tag == 'NNP' and not details["origin"] and potential_location in ORIGINS:
                 details["origin"] = potential_location
@@ -74,6 +69,14 @@ def parse_booking_details(user_input, booking_details):
     # Extract departure date (e.g., "tomorrow" or "DD-MM-YYYY")
     if not details["departure_date"]:
         details["departure_date"] = parse_date(user_input)
+
+    # Print acknowledgment of parsed details
+    print("\nBot: Here's what I've understood so far:")
+    for key, value in details.items():
+        if value:
+            print(f" - {key.capitalize()}: {value}")
+        else:
+            print(f" - {key.capitalize()}: Not provided yet")
 
     return details
 
@@ -137,7 +140,6 @@ def prompt_for_missing_detail(detail_name, prompt_text, validation_func=None):
 def booking_flow(name, user_input):
     # Initialize or update booking details from user input
     booking_details = parse_booking_details(user_input, {})
-    print(f"Parsed booking details: {booking_details}")
 
     # Prompt user for missing details
     if not booking_details["origin"]:
