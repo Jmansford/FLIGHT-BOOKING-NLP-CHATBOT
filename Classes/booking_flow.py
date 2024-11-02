@@ -5,6 +5,10 @@ import re
 from Classes.preprocessing import preprocess_input
 from nltk.corpus import stopwords
 
+# List of available origins and destinations
+ORIGINS = ["London", "Toronto", "Sydney", "Dubai", "Frankfurt", "Mumbai"]
+DESTINATIONS = ["Paris", "New York", "Berlin", "Singapore", "Tokyo", "Amsterdam"]
+
 # Connect to SQLite database
 def connect_to_db():
     return sqlite3.connect('Resources/flight_booking.db')
@@ -13,8 +17,10 @@ def connect_to_db():
 def extract_location(user_input):
     tokens = preprocess_input(user_input)
     stop_words = set(stopwords.words('english'))
+    # Filter out stop words and join remaining tokens to handle multi-word locations
     filtered_tokens = [token for token in tokens if token not in stop_words and token.isalpha()]
-    return filtered_tokens[-1].capitalize() if filtered_tokens else user_input
+    return ' '.join(filtered_tokens).title() if filtered_tokens else user_input
+
 
 # Helper function to parse dates from user input
 def parse_date(input_date, reference_date=None):
@@ -90,27 +96,30 @@ def booking_flow(name):
     
     print("Bot: Let's get the details for your flight booking.")
     
-    # Step 1: Get Origin
+    # Step 1: Get Origin with validation
     booking_details["origin"] = get_user_input(
-        "Please provide the origin", lambda x: extract_location(x)
+        f"Please provide the origin (Available: {', '.join(ORIGINS)})", 
+        lambda x: extract_location(x) if extract_location(x) in ORIGINS else None
     )
-    print(get_response("origin", origin=booking_details["origin"]))
+    print(get_response("origin", origin=booking_details["origin"])) 
     
-    # Step 2: Get Destination
+    # Step 2: Get Destination with validation
     booking_details["destination"] = get_user_input(
-        "Please provide the destination", lambda x: extract_location(x)
+        f"Please provide the destination (Available: {', '.join(DESTINATIONS)})", 
+        lambda x: extract_location(x) if extract_location(x) in DESTINATIONS else None
     )
     print(get_response("destination", destination=booking_details["destination"]))
     
     # Step 3: Get Departure Date
     booking_details["departure_date"] = get_user_input(
-        "When would you like to depart?", lambda x: parse_date(x)
+        "When would you like to depart? (Format: DD-MM-YYYY or relative terms like 'tomorrow')", 
+        lambda x: parse_date(x)
     )
     print(get_response("departure_date", departure_date=booking_details["departure_date"].strftime('%d-%m-%Y')))
     
     # Step 4: Get Travel Class
     booking_details["travel_class"] = get_user_input(
-        "What class would you like to travel in? (economy, business, first):", 
+        "What class would you like to travel in? (economy, business, first)", 
         lambda x: x.lower() if x.lower() in ["economy", "business", "first"] else None
     )
     print(get_response("travel_class", travel_class=booking_details["travel_class"]))
@@ -130,10 +139,10 @@ def booking_flow(name):
         if len(flights) == 1:
             # Direct confirmation if only one flight is found
             flight = flights[0]
-            print(f"Bot: I found one flight: Flight {flight[0]} from {flight[1]} to {flight[2]}, "
+            print(f"Bot: I found one flight: \n\nFlight {flight[0]} from {flight[1]} to {flight[2]}, "
                   f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
-                  f"Class: {flight[5]}, Price: ${flight[6]}")
-            confirm = get_user_input("Would you like to book this flight? (yes/no):", lambda x: x.lower() in ["yes", "no", "y", "n"])
+                  f"Class: {flight[5]}, Price: ${flight[6]}\n")
+            confirm = get_user_input("Would you like to book this flight? (yes/no)", lambda x: x.lower() in ["yes", "no", "y", "n"])
             if confirm in ["yes", "y"]:
                 booking_details["flight_number"] = flight[0]
                 print(get_response("booking_confirmed"))
@@ -147,7 +156,7 @@ def booking_flow(name):
                       f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
                       f"Class: {flight[5]}, Price: ${flight[6]}")
             # Prompt user to select a flight
-            selected_flight = get_user_input("Please enter the number of the flight you'd like to book:", 
+            selected_flight = get_user_input("Please enter the number of the flight you'd like to book", 
                                              lambda x: flights[int(x)-1] if x.isdigit() and 0 < int(x) <= len(flights) else None)
             booking_details["flight_number"] = selected_flight[0]
             print(get_response("booking_confirmed_details", flight_number=selected_flight[0], origin=selected_flight[1],
@@ -157,4 +166,4 @@ def booking_flow(name):
         print("Bot: I couldn't find any flights matching your criteria.")
 
     # Close the database connection
-    conn.close()
+    conn.close() 
