@@ -23,7 +23,8 @@ def chatbot():
         if intent == "greeting":
             print(get_response("greeting", name=name))
         elif intent == "booking":
-            booking_flow(name)
+            # Pass both name and user_input to booking_flow
+            booking_flow(name, user_input)
         elif intent == "thanks":
             print(get_response("thanks", name=name))
         elif intent == "farewell":
