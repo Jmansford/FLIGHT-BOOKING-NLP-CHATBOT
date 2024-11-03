@@ -2,31 +2,6 @@ import random
 
 # Response dictionary for variations
 responses = {
-    "origin": [
-        "Got it, you're flying from {origin}.",
-        "Okay, I have your origin as {origin}.",
-        "Noted, departing from {origin}."
-    ],
-    "destination": [
-        "Great, you're flying to {destination}.",
-        "Destination set to {destination}.",
-        "Got it, flying to {destination}."
-    ],
-    "departure_date": [
-        "Your departure date is set to {departure_date}.",
-        "Departure date noted as {departure_date}.",
-        "Okay, leaving on {departure_date}."
-    ],
-    "return_date": [
-        "Return date set to {return_date}.",
-        "Got it, returning on {return_date}.",
-        "Return date noted as {return_date}."
-    ],
-    "travel_class": [
-        "Travel class set to {travel_class}.",
-        "Noted, {travel_class} class.",
-        "{travel_class} class selected. Let me see what's available."
-    ],
     "greeting": [
         "Hello {name}, how can I assist you today?",
         "Hi {name}! What can I do for you today?",
@@ -63,20 +38,45 @@ responses = {
         "If I remember correctly, your name is {name}.",
         "You're {name}, right?"
     ],
-    "one_way": [
-        "You have selected a one-way trip.",
-        "Noted, this is a one-way trip.",
-        "One-way trip confirmed."
+    "origin_prompt": [
+        "Could you let me know where you're flying from? Available options are: {available_origins}.",
+        "Great! From which city would you like to start your journey? Choices are: {available_origins}.",
+        "Alright, please tell me your origin city. You can choose from: {available_origins}."
     ],
-    "booking_confirmed_details": [
-        "Flight successfully booked from {origin} to {destination} on {departure_date} in {travel_class} class.",
-        "I've booked you a flight from {origin} to {destination} on {departure_date} in {travel_class} class.",
-        "All sorted! You're flying from {origin} to {destination} on {departure_date} in {travel_class} class."
+    "destination_prompt": [
+        "Where are you headed? Available options are: {available_destinations}.",
+        "Could you share your destination? Here’s what we have: {available_destinations}.",
+        "Please let me know your destination from these options: {available_destinations}."
+    ],
+    "departure_date_prompt": [
+        "When would you like to depart? (Format: DD-MM-YYYY or words like 'tomorrow')",
+        "What is your desired departure date? You can also mention terms like 'next week'.",
+        "Could you provide the departure date? Feel free to use relative terms like 'tomorrow'."
+    ],
+    "travel_class_prompt": [
+        "What class would you like to travel in? (economy, business, first)",
+        "Which travel class do you prefer: economy, business, or first?",
+        "Could you specify the travel class: economy, business, or first?"
+    ],
+    "confirmation_prompt": [
+        "Would you like to proceed with this booking?",
+        "Is this flight good for you to confirm the booking?",
+        "Should I go ahead and book this flight for you?"
     ],
     "booking_confirmed": [
-        "Your flight has been booked successfully!",
-        "All done! Your flight is booked.",
-        "Great! Your flight is confirmed and booked."
+        "Your booking is confirmed! Safe travels!",
+        "All set! Your flight has been booked.",
+        "Booking complete. Wishing you a great journey!"
+    ],
+    "booking_confirmed_details": [
+        "Your flight {flight_number} from {origin} to {destination} on {departure_date} in {travel_class} class is booked!",
+        "You're all set! Flight {flight_number} from {origin} to {destination} has been booked for {departure_date} in {travel_class} class.",
+        "Confirmation received! Flight {flight_number} from {origin} to {destination} on {departure_date} ({travel_class}) is booked!"
+    ],
+    "no_flights_found": [
+        "I couldn't find any flights matching your criteria. Looking for alternatives...",
+        "No flights were found with the provided details. Checking what else is available...",
+        "I'm sorry, but I couldn’t locate any flights with the current details. Let me find other options..."
     ]
 }
 

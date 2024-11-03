@@ -77,7 +77,7 @@ def parse_booking_details(user_input, booking_details):
             print(f" - {key.capitalize()}: {value}")
         else:
             print(f" - {key.capitalize()}: Not provided yet")
-
+    print("")
     return details
 
 # Helper function to parse dates from user input based on keywords
@@ -111,7 +111,7 @@ def find_flights(conn, origin, destination, departure_date, travel_class):
     flights = cursor.fetchall()
 
     if not flights:
-        print("Bot: I couldn't find an available flight for these dates and locations. Searching for the next available flight...")
+        print(get_response("no_flights_found"))
         query = '''
         SELECT flight_number, origin, destination, departure_date, return_date, travel_class, price
         FROM flights
@@ -125,9 +125,10 @@ def find_flights(conn, origin, destination, departure_date, travel_class):
     return flights
 
 # Helper function to prompt user for missing details
-def prompt_for_missing_detail(detail_name, prompt_text, validation_func=None):
+def prompt_for_missing_detail(detail_name, prompt_text, name, validation_func=None):
     while True:
-        response = input(f"Bot: {prompt_text}: ")
+        print(f"{prompt_text}")
+        response = input(f"{name}: ")
         if validation_func:
             valid_response = validation_func(response)
             if valid_response:
@@ -144,25 +145,25 @@ def booking_flow(name, user_input):
     # Prompt user for missing details
     if not booking_details["origin"]:
         booking_details["origin"] = prompt_for_missing_detail(
-            "origin", f"Please provide the origin (Available: {', '.join(ORIGINS)})", 
+            "origin", get_response("origin_prompt", available_origins=", ".join(ORIGINS)), name,
             lambda x: best_match_location(x, ORIGINS)
         )
 
     if not booking_details["destination"]:
         booking_details["destination"] = prompt_for_missing_detail(
-            "destination", f"Please provide the destination (Available: {', '.join(DESTINATIONS)})", 
+            "destination", get_response("destination_prompt", available_destinations=", ".join(DESTINATIONS)), name,
             lambda x: best_match_location(x, DESTINATIONS)
         )
 
     if not booking_details["departure_date"]:
         booking_details["departure_date"] = prompt_for_missing_detail(
-            "departure_date", "When would you like to depart? (Format: DD-MM-YYYY or relative terms like 'tomorrow')", 
+            "departure_date", get_response("departure_date_prompt"), name,
             lambda x: parse_date(x)
         )
 
     if not booking_details["travel_class"]:
         booking_details["travel_class"] = prompt_for_missing_detail(
-            "travel_class", "What class would you like to travel in? (economy, business, first)", 
+            "travel_class", get_response("travel_class_prompt"), name,
             lambda x: x.lower() if x.lower() in ["economy", "business", "first"] else None
         )
 
@@ -183,7 +184,8 @@ def booking_flow(name, user_input):
             print(f"Bot: I found one flight: \n\nFlight {flight[0]} from {flight[1]} to {flight[2]}, "
                   f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
                   f"Class: {flight[5]}, Price: ${flight[6]}\n")
-            confirm = input("Would you like to book this flight? (yes/no): ").lower()
+            print(get_response("confirmation_prompt"))
+            confirm = input(f"{name}: ")
             if confirm in ["yes", "y"]:
                 booking_details["flight_number"] = flight[0]
                 print(get_response("booking_confirmed"))
@@ -195,7 +197,8 @@ def booking_flow(name, user_input):
                 print(f"{i}. Flight {flight[0]} from {flight[1]} to {flight[2]}, "
                       f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
                       f"Class: {flight[5]}, Price: ${flight[6]}")
-            selected_flight_index = int(input("Please enter the number of the flight you'd like to book: ")) - 1
+            print("\nBot: Please enter the number of the flight you'd like to book.")
+            selected_flight_index = int(input(f"{name}: ")) - 1
             selected_flight = flights[selected_flight_index]
             booking_details["flight_number"] = selected_flight[0]
             print(get_response("booking_confirmed_details", flight_number=selected_flight[0], origin=selected_flight[1],
