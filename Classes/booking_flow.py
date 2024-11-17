@@ -14,12 +14,28 @@ def connect_to_db():
     return sqlite3.connect('Resources/flight_booking.db')
 
 # Function to find the best matching location from a list based on user input
-def best_match_location(user_input, location_list, max_distance=3):
+def best_match_location(user_input, location_list, max_distance=2):
     tokens = word_tokenize(user_input)
     filtered_tokens = [token.capitalize() for token in tokens if token.isalpha()]
     location = ' '.join(filtered_tokens)
     best_match = min(location_list, key=lambda x: edit_distance(location, x))
     return best_match if edit_distance(location, best_match) <= max_distance else None
+
+# Helper function to confirm the best match location with the user
+def confirm_location(user_input, location_list, name):
+    # Try to find the best match for the user's input
+    suggested_location = best_match_location(user_input, location_list)
+    # Only ask for confirmation if the suggested location is not an exact match
+    if suggested_location and suggested_location.lower() != user_input.lower():
+        print(f"Bot: Did you mean '{suggested_location}'? (yes/no)")
+        confirm = input(f"{name}: ").strip().lower()
+        if confirm in ["yes", "y"]:
+            return suggested_location
+        else:
+            print("Bot: Got it, please try again.")
+    # Return the input unchanged if it matches exactly or user did not confirm
+    return user_input if user_input.capitalize() in location_list else None
+
 
 # Parse booking details from user input with enhanced origin/destination handling
 def parse_booking_details(user_input, booking_details, name):
@@ -49,43 +65,24 @@ def parse_booking_details(user_input, booking_details, name):
         from_index = tokens.index("from") + 1
         if from_index < len(tokens):
             potential_origin = tokens[from_index]
-            # Check if the word after "from" is a proper noun
             if pos_tags[from_index][1] == 'NNP' or potential_origin.capitalize() in ORIGINS:
-                details["origin"] = best_match_location(potential_origin, ORIGINS) or details["origin"]
-            elif not details["origin"]:
-                # Attempt to find a close match with best_match_location if not found
-                suggested_origin = best_match_location(potential_origin, ORIGINS)
-                if suggested_origin:
-                    print(f"Bot: Did you mean '{suggested_origin}' as your origin? (yes/no)")
-                    confirm = input(f"{name}: ").strip().lower()
-                    if confirm in ["yes", "y"]:
-                        details["origin"] = suggested_origin
+                details["origin"] = confirm_location(potential_origin, ORIGINS, name) or details["origin"]
 
     if "to" in tokens:
         to_index = tokens.index("to") + 1
         if to_index < len(tokens):
             potential_destination = tokens[to_index]
-            # Check if the word after "to" is a proper noun
             if pos_tags[to_index][1] == 'NNP' or potential_destination.capitalize() in DESTINATIONS:
-                details["destination"] = best_match_location(potential_destination, DESTINATIONS) or details["destination"]
-            elif not details["destination"]:
-                # Attempt to find a close match with best_match_location if not found
-                suggested_destination = best_match_location(potential_destination, DESTINATIONS)
-                if suggested_destination:
-                    print(f"Bot: Did you mean '{suggested_destination}' as your destination? (yes/no)")
-                    confirm = input(f"{name}: ").strip().lower()
-                    if confirm in ["yes", "y"]:
-                        details["destination"] = suggested_destination
+                details["destination"] = confirm_location(potential_destination, DESTINATIONS, name) or details["destination"]
 
     # Use POS tagging as backup if "from" and "to" are not used
     if not details["origin"] or not details["destination"]:
         for word, tag in pos_tags:
             potential_location = word.capitalize()
             if tag == 'NNP' and not details["origin"] and potential_location in ORIGINS:
-                details["origin"] = potential_location
+                details["origin"] = confirm_location(potential_location, ORIGINS, name)
             elif tag == 'NNP' and not details["destination"] and potential_location in DESTINATIONS:
-                details["destination"] = potential_location
-
+                details["destination"] = confirm_location(potential_location, DESTINATIONS, name)
 
     # Extract departure date (e.g., "tomorrow" or "DD-MM-YYYY")
     if not details["departure_date"]:
@@ -149,14 +146,25 @@ def find_flights(conn, origin, destination, departure_date, travel_class):
 def prompt_for_missing_detail(detail_name, prompt_text, name, validation_func=None):
     while True:
         print(f"{prompt_text}")
-        response = input(f"{name}: ")
+        response = input(f"{name}: ").strip()
+        
+        # Use confirm_location if the detail is a location
+        if detail_name in ["origin", "destination"]:
+            location_list = ORIGINS if detail_name == "origin" else DESTINATIONS
+            confirmed_location = confirm_location(response, location_list, name)
+            if confirmed_location:
+                return confirmed_location
+        
+        # Apply validation function if provided
         if validation_func:
             valid_response = validation_func(response)
             if valid_response:
                 return valid_response
         else:
             return response
+        
         print("Bot: Please enter a valid input.")
+
 
 # Main booking flow with detail prompting
 def booking_flow(name, user_input):
