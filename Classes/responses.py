@@ -21,10 +21,10 @@ responses = {
         "Farewell, {name}! Stay safe."
     ],
     "how_are_you": [
-        "I'm good, but I'm here to help you!",
-        "I'm doing great, thanks for asking! How can I assist you?",
-        "I don't have feelings, but I'm ready to help you!",
-        "I'm here and ready to assist you!"
+        "I'm good, but I'm here to help you! How are you?",
+        "I'm doing great, thanks for asking! How can I assist you? How are you?",
+        "I don't have feelings, but I'm ready to help you! How are you?",
+        "I'm here and ready to assist you! How are you?"
     ],
     "capabilities": [
         "I can help you book a flight, tell you your name, and answer simple questions.",
