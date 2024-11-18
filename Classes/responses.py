@@ -77,7 +77,28 @@ responses = {
         "I couldn't find any flights matching your criteria. Looking for alternatives...",
         "No flights were found with the provided details. Checking what else is available...",
         "I'm sorry, but I couldn’t locate any flights with the current details. Let me find other options..."
-    ]
+    ],
+    "positive_feelings": [
+        "That's great to hear, {name}! How can I make your day even better?",
+        "I'm glad you're feeling good, {name}! Let me know how I can assist.",
+        "Wonderful! Keep up the positivity, {name}! How can I help today?",
+        "Awesome, {name}! I'm here to keep that good mood going. What do you need?"
+    ],
+    "negative_feelings": [
+        "I'm sorry to hear that, {name}. How can I help make things a bit better?",
+        "Oh no, {name}, I hope things improve for you soon. Is there something I can assist with?",
+        "That doesn't sound great, {name}. Let me know if there's anything I can do for you.",
+        "I'm here for you, {name}. Let me know how I can help make your day a little easier."
+    ],
+    "neutral_feelings": [
+    "Thanks for sharing, {name}. Let me know how I can help.",
+    "I hear you, {name}. How can I assist you today?",
+    "Got it, {name}. Let me know if there's anything I can do.",
+    "Thanks for letting me know, {name}. What can I help you with?",
+    "I appreciate you sharing, {name}. How can I assist you?",
+    "Alright, {name}. Let me know what you need help with.",
+    "Thank you for telling me, {name}. How can I support you today?"
+]
 }
 
 # Get a random response based on the intent and optional parameters

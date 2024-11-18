@@ -40,10 +40,7 @@ def chatbot():
             print(get_response("farewell", name=name))
             break
         elif intent == "how_are_you":
-            # Bot's initial response
             print(get_response("how_are_you"))
-            
-            # Ask the user how they are feeling
             user_response = input(f"{name}: ")
             
             # Analyse sentiment of the user's response
@@ -51,11 +48,11 @@ def chatbot():
             
             # Respond based on sentiment
             if sentiment == "positive":
-                print("Bot: I'm glad to hear that!")
+                print(get_response("positive_feelings", name=name))
             elif sentiment == "negative":
-                print("Bot: I'm sorry to hear that. I hope things improve soon.")
+                print(get_response("negative_feelings", name=name))
             else:
-                print("Bot: Thank you for sharing. I'm here if you need anything.")
+                print(get_response("neutral_feelings", name=name))
         elif intent == "capabilities":
             print(get_response("capabilities"))
         elif intent == "user_name":
