@@ -168,6 +168,32 @@ def save_booking(conn, booking_details, name):
     conn.commit()
     print("Bot: Your booking has been saved successfully.")
 
+    # Display all bookings for the user
+def display_bookings(name):
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT flight_number, origin, destination, departure_date, travel_class
+        FROM bookings
+        WHERE user_name = ?
+        ORDER BY departure_date ASC
+    ''', (name,))
+    bookings = cursor.fetchall()
+    conn.close()
+
+    if not bookings:
+        print("Bot: You have no bookings at the moment.")
+        return None
+
+    print("Bot: Here are your current bookings:")
+    for booking in bookings:
+        print(f"Flight: {booking[0]} from {booking[1]} to {booking[2]}, "
+              f"Departure: {booking[3]}, "
+              f"Class: {booking[4]}")
+    return bookings
+
+
+
 # Main booking flow
 def booking_flow(name, user_input):
     booking_details = parse_booking_details(user_input, {}, name)

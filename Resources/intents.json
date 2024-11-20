@@ -18,6 +18,23 @@
             "book my trip",
             "I’d like to travel to Paris by flight"
         ],
+        "edit_view_booking": [
+            "view my booking",
+            "show my flight details",
+            "I want to see my booking",
+            "can you show me my reservation",
+            "what is my flight itinerary",
+            "can I edit my booking",
+            "I need to change my flight",
+            "modify my reservation",
+            "how do I update my booking",
+            "I’d like to see my trip details",
+            "can I update my flight",
+            "help me change my travel plans",
+            "can you edit my booking",
+            "I want to view or edit my booking",
+            "show me my travel itinerary"
+        ],
         "greeting": [
             "hello",
             "hi there",

@@ -1,6 +1,6 @@
 from Classes.responses import get_response
 from Classes.intent_matching import match_intent
-from Classes.booking_flow import booking_flow
+from Classes.booking_flow import booking_flow, display_bookings
 from Classes.database_setup import setup_database
 from Classes.sentiment_analysis import classify_sentiment
 from Classes.greeting import welcome_user
@@ -35,6 +35,8 @@ def chatbot():
             print(get_response("capabilities"))
         elif intent == "user_name":
             print(get_response("user_name", name=name))
+        elif intent == "edit_view_booking":
+            display_bookings(name)
         else:
             print("Bot: I'm not sure I understand. Could you please clarify?")
 
