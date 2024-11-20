@@ -3,9 +3,11 @@ from Classes.responses import get_response
 
 DB_PATH = 'Resources/flight_booking.db'
 
+# Function to connect to the database
 def connect_to_db():
     return sqlite3.connect(DB_PATH)
 
+# Function to check if the user has made a booking before
 def check_existing_user(username):
     conn = connect_to_db()
     cursor = conn.cursor()
@@ -15,10 +17,12 @@ def check_existing_user(username):
     conn.close()
     return result
 
+# Function to get the user's name
 def get_user_name():
     print("\nBot: Hi, let's get started with your name: ")
     return input("Enter your name: ").strip()
 
+# Function to welcome the user and display their last booking
 def welcome_user():
     username = get_user_name()
     last_booking = check_existing_user(username)

@@ -12,7 +12,7 @@ DESTINATIONS = ["Paris", "New York", "Berlin", "Singapore", "Tokyo", "Amsterdam"
 def connect_to_db():
     return sqlite3.connect('Resources/flight_booking.db')
 
-# Match user input with the closest location
+# Match user input with the closest location accounting for typos
 def best_match_location(user_input, location_list, max_distance=2):
     tokens = word_tokenize(user_input)
     filtered_tokens = [token.capitalize() for token in tokens if token.isalpha()]
@@ -112,7 +112,7 @@ def find_flights(conn, origin, destination, departure_date, travel_class):
 
     return flights
 
-# Prompt user for missing details
+# Prompt user for missing booking details
 def prompt_for_missing_detail(detail_name, prompt_text, name, validation_func=None):
     while True:
         print(f"{prompt_text}")
@@ -151,6 +151,7 @@ def save_booking(conn, booking_details, name):
     conn.commit()
     print("Bot: Your booking has been saved successfully.")
 
+# PPrint out bookings for a specified user
 def display_bookings(name):
     conn = connect_to_db()
     cursor = conn.cursor()
@@ -174,6 +175,7 @@ def display_bookings(name):
               f"Class: {booking[4]}")
     return bookings
 
+# Display bookings for a specified user and allow them to cancel a booking
 def display_and_cancel_booking(name):
     bookings = display_bookings(name)
     if not bookings:

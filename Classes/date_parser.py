@@ -29,6 +29,7 @@ def get_weekday_date(weekday_name, nextFlag):
     
     return today + timedelta(days=days_until_next_weekday)
 
+# Function to convert various formats of date inputs into a datetime object
 def parse_date(input_text):
     reference_date = datetime.now()
 

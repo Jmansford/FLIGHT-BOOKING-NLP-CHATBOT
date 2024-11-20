@@ -26,6 +26,7 @@ pipeline.fit(responses, sentiments)
 # Save the model for reuse
 dump(pipeline, 'sentiment_pipeline.joblib')
 
+# Print a different output based on the classified sentiment
 def classify_sentiment(user_input, name):
     pipeline = load('sentiment_pipeline.joblib')
     sentiment = pipeline.predict([user_input])[0]
