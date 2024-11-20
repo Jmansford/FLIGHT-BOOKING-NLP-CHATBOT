@@ -2,7 +2,6 @@ from Classes.responses import get_response
 from Classes.intent_matching import match_intent
 from Classes.booking_flow import booking_flow
 from Classes.database_setup import setup_database
-from joblib import load  # For loading the sentiment analysis model
 from Classes.sentiment_analysis import classify_sentiment
 
 
@@ -10,12 +9,6 @@ from Classes.sentiment_analysis import classify_sentiment
 def get_user_name():
     print("Bot: Hi, let's get started with your name: ")
     return input("Enter your name: ")
-
-# Sentiment analysis function
-def classify_sentiment(user_input):
-    pipeline = load('sentiment_pipeline.joblib')  # Load the saved model
-    sentiment = pipeline.predict([user_input])[0]
-    return sentiment
 
 # Chatbot Main Loop
 def chatbot():
@@ -42,17 +35,7 @@ def chatbot():
         elif intent == "how_are_you":
             print(get_response("how_are_you"))
             user_response = input(f"{name}: ")
-            
-            # Analyse sentiment of the user's response
-            sentiment = classify_sentiment(user_response)
-            
-            # Respond based on sentiment
-            if sentiment == "positive":
-                print(get_response("positive_feelings", name=name))
-            elif sentiment == "negative":
-                print(get_response("negative_feelings", name=name))
-            else:
-                print(get_response("neutral_feelings", name=name))
+            classify_sentiment(user_response, name)
         elif intent == "capabilities":
             print(get_response("capabilities"))
         elif intent == "user_name":

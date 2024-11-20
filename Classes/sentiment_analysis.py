@@ -1,10 +1,10 @@
-import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
 from joblib import dump, load
 import pandas as pd
+from Classes.responses import get_response
 
 # Load the new training dataset
 data = pd.read_csv('Resources/large_sentiment_training_dataset.csv')
@@ -26,9 +26,13 @@ pipeline.fit(responses, sentiments)
 # Save the model for reuse
 dump(pipeline, 'sentiment_pipeline.joblib')
 
-# Define the callable function
-def classify_sentiment(user_input):
-    """Classify the sentiment of the user's input."""
+def classify_sentiment(user_input, name):
     pipeline = load('sentiment_pipeline.joblib')
     sentiment = pipeline.predict([user_input])[0]
-    return sentiment
+    if sentiment == "positive":
+        print(get_response("positive_feelings", name=name))
+    elif sentiment == "negative":
+        print(get_response("negative_feelings", name=name))
+    else:
+        print(get_response("neutral_feelings", name=name))
+
