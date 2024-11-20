@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import re
 from nltk import pos_tag, word_tokenize
 from nltk.metrics import edit_distance
+from Classes.date_parser import parse_date 
 
 # Constants for available origins and destinations
 ORIGINS = ["London", "Toronto", "Sydney", "Dubai", "Frankfurt", "Mumbai"]
@@ -86,22 +87,6 @@ def parse_booking_details(user_input, booking_details, name):
             print(f" - {key.capitalize()}: {value or 'Not provided yet'}")
         print("")
     return details
-
-# Parse dates from user input
-def parse_date(input_text):
-    reference_date = datetime.now()
-    try:
-        if "tomorrow" in input_text:
-            return reference_date + timedelta(days=1)
-        elif "next week" in input_text:
-            return reference_date + timedelta(weeks=1)
-        elif "in " in input_text and " days" in input_text:
-            days = int(re.search(r'in (\d+) days', input_text).group(1))
-            return reference_date + timedelta(days=days)
-        else:
-            return datetime.strptime(input_text, '%d-%m-%Y')
-    except (ValueError, AttributeError):
-        return None
 
 # Find flights in the database
 def find_flights(conn, origin, destination, departure_date, travel_class):
