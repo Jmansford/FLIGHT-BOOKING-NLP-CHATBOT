@@ -168,7 +168,6 @@ def save_booking(conn, booking_details, name):
     conn.commit()
     print("Bot: Your booking has been saved successfully.")
 
-    # Display all bookings for the user
 def display_bookings(name):
     conn = connect_to_db()
     cursor = conn.cursor()
@@ -192,6 +191,41 @@ def display_bookings(name):
               f"Class: {booking[4]}")
     return bookings
 
+def display_and_cancel_booking(name):
+    bookings = display_bookings(name)
+    if not bookings:
+        return
+
+    print("\nBot: Would you like to cancel one of your bookings? (yes/no)")
+    confirm = input(f"{name}: ").strip().lower()
+    if confirm not in ["yes", "y"]:
+        print("Bot: No problem, let me know if you need anything else.")
+        return
+
+    print("Bot: Please enter the Flight Number of the booking you'd like to cancel:")
+    flight_number = input(f"{name}: ").strip()
+
+    matching_bookings = [b for b in bookings if b[0] == flight_number]
+    if not matching_bookings:
+        print("Bot: I couldn't find that flight in your bookings. Please try again.")
+        return
+
+    print(f"Bot: Are you sure you want to cancel the booking for Flight {flight_number}? (yes/no)")
+    final_confirm = input(f"{name}: ").strip().lower()
+    if final_confirm not in ["yes", "y"]:
+        print("Bot: Your booking was not canceled.")
+        return
+
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        DELETE FROM bookings
+        WHERE user_name = ? AND flight_number = ?
+    ''', (name, flight_number))
+    conn.commit()
+    conn.close()
+
+    print(f"Bot: Your booking for Flight {flight_number} has been successfully canceled.")
 
 
 # Main booking flow
