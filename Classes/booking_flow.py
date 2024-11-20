@@ -89,7 +89,7 @@ def parse_booking_details(user_input, booking_details, name):
         details["departure_date"] = parse_date(user_input)
 
     # Print acknowledgment of parsed details
-    if(all(details.values())):
+    if(any(details.values())):
         print("\nBot: Here's what I've understood so far:")
         for key, value in details.items():
             if value:
@@ -166,6 +166,25 @@ def prompt_for_missing_detail(detail_name, prompt_text, name, validation_func=No
         
         print("Bot: Please enter a valid input.")
 
+def save_booking(conn, booking_details, name):
+    """
+    Saves the booking details to the database.
+    """
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO bookings (user_name, origin, destination, departure_date, return_date, flight_number, travel_class)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        name,
+        booking_details["origin"],
+        booking_details["destination"],
+        booking_details["departure_date"].strftime('%d-%m-%Y'),
+        booking_details.get("return_date").strftime('%d-%m-%Y') if booking_details.get("return_date") else None,
+        booking_details["flight_number"],
+        booking_details["travel_class"]
+    ))
+    conn.commit()
+    print("Bot: Your booking has been saved successfully.")
 
 # Main booking flow with detail prompting
 def booking_flow(name, user_input):
@@ -209,31 +228,18 @@ def booking_flow(name, user_input):
 
     # Handle flight selection based on availability
     if flights:
-        if len(flights) == 1:
-            flight = flights[0]
-            print(f"Bot: I found one flight: \n\nFlight {flight[0]} from {flight[1]} to {flight[2]}, "
-                  f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
-                  f"Class: {flight[5]}, Price: ${flight[6]}\n")
-            print(get_response("confirmation_prompt"))
-            confirm = input(f"{name}: ")
-            if confirm in ["yes", "y"]:
-                booking_details["flight_number"] = flight[0]
-                print(get_response("booking_confirmed"))
-            else:
-                print("Bot: No problem, let me know if you need anything else.")
+        flight = flights[0]
+        print(f"Bot: I found one flight: \n\nFlight {flight[0]} from {flight[1]} to {flight[2]}, "
+                f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
+                f"Class: {flight[5]}, Price: ${flight[6]}\n")
+        print(get_response("confirmation_prompt"))
+        confirm = input(f"{name}: ")
+        if confirm in ["yes", "y"]:
+            booking_details["flight_number"] = flight[0]
+            print(get_response("booking_confirmed"))
+            save_booking(conn, booking_details, name)
         else:
-            print("Bot: Here are the available flights:")
-            for i, flight in enumerate(flights, start=1):
-                print(f"{i}. Flight {flight[0]} from {flight[1]} to {flight[2]}, "
-                      f"Departure: {flight[3]}, Return: {flight[4] if flight[4] else 'One-way'}, "
-                      f"Class: {flight[5]}, Price: ${flight[6]}")
-            print("\nBot: Please enter the number of the flight you'd like to book.")
-            selected_flight_index = int(input(f"{name}: ")) - 1
-            selected_flight = flights[selected_flight_index]
-            booking_details["flight_number"] = selected_flight[0]
-            print(get_response("booking_confirmed_details", flight_number=selected_flight[0], origin=selected_flight[1],
-                               destination=selected_flight[2], departure_date=selected_flight[3],
-                               travel_class=selected_flight[5]))
+            print("Bot: No problem, let me know if you need anything else.")
     else:
         print("Bot: I couldn't find any flights matching your criteria.")
 

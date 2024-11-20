@@ -68,8 +68,30 @@ def setup_database():
             WHERE destination = ? AND departure_date = ? AND travel_class = ?
             ''', (destination, departure_date, travel_class))
 
+    def create_bookings_table():
+        # Connect to the SQLite database (or create it if it doesn't exist)
+        conn = sqlite3.connect('Resources/flight_booking.db')
+        cursor = conn.cursor()
+
+        # Create the bookings table if it doesn't exist
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bookings (
+            id INTEGER PRIMARY KEY,
+            user_name TEXT NOT NULL,
+            origin TEXT NOT NULL,
+            destination TEXT NOT NULL,
+            departure_date TEXT NOT NULL,
+            return_date TEXT,
+            flight_number TEXT NOT NULL,
+            travel_class TEXT NOT NULL
+        )
+        ''')
+        conn.commit()
+        print("Bookings table created successfully.")
+
     # Generate new flight data
     flight_data = generate_flight_data()
+    create_bookings_table()
 
     # Delete existing flights to avoid duplicates
     delete_existing_flights(cursor, flight_data)
