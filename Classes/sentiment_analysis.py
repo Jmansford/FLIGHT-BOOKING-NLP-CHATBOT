@@ -1,9 +1,9 @@
+import pandas as pd
+from joblib import dump, load
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
-from joblib import dump, load
-import pandas as pd
 from Classes.responses import get_response
 
 # Load the new training dataset

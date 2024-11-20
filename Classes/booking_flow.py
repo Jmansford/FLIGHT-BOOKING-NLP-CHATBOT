@@ -1,7 +1,5 @@
 import sqlite3
 from Classes.responses import get_response
-from datetime import datetime, timedelta
-import re
 from nltk import pos_tag, word_tokenize
 from nltk.metrics import edit_distance
 from Classes.date_parser import parse_date 
