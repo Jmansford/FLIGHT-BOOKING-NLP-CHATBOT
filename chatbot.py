@@ -5,8 +5,6 @@ from Classes.database_setup import setup_database
 from Classes.sentiment_analysis import classify_sentiment
 from Classes.greeting import welcome_user
 
-# Identity management
-
 # Chatbot Main Loop
 def chatbot():
     setup_database()

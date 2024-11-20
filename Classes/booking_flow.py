@@ -169,7 +169,7 @@ def display_bookings(name):
         print("Bot: You have no bookings at the moment.")
         return None
 
-    print("Bot: Here are your current bookings:")
+    print("Bot: Here are your current bookings:\n")
     for booking in bookings:
         print(f"Flight: {booking[0]} from {booking[1]} to {booking[2]}, "
               f"Departure: {booking[3]}, "

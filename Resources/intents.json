@@ -26,6 +26,9 @@
             "what is my flight itinerary",
             "can I edit my booking",
             "I need to change my flight",
+            "I want to cancel my booking",
+            "I want to cancel a trip",
+            "I want to delete a reservation",
             "modify my reservation",
             "how do I update my booking",
             "I’d like to see my trip details",
@@ -64,28 +67,25 @@
             "how can you help",
             "what are your features",
             "tell me your functions",
-            "what can I ask you"
+            "what can I ask you",
+            "what are your abilities",
+            "what are you capable of"
         ],
         "user_name": [
             "what is my name",
             "do you know my name",
             "who am I",
             "can you tell my name",
-            "what do you know about me"
+            "what do you know about me",
+            "what do you call me"
         ],
         "how_are_you": [
             "how are you",
             "how's it going",
             "how do you do",
             "how are things",
-            "are you doing well"
-        ],
-        "weather": [
-            "what's the weather like",
-            "tell me the weather",
-            "how's the weather today",
-            "will it rain today",
-            "what's the forecast"
+            "are you doing well",
+            "are you okay"
         ]
     }
 }

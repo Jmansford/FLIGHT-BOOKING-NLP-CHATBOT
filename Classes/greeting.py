@@ -25,7 +25,7 @@ def welcome_user():
 
     if last_booking:
         origin, destination, departure_date = last_booking
-        print(f"\nBot: Welcome back, {username}! Last time, you booked a flight from {origin} to {destination} on {departure_date}. How can I assist you today?")
+        print(f"Bot: Welcome back, {username}! Last time, you booked a flight from {origin} to {destination} on {departure_date}. How can I assist you today?")
     else:
         print(get_response("new_user_greeting", name=username))
     
