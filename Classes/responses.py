@@ -8,6 +8,14 @@ responses = {
         "Hey {name}, how can I help you?",
         "Greetings {name}, what do you need today?"
     ],
+    "new_user_greeting": [
+        "Hello {name}! Welcome to the Travel Booking Assistant. How can I assist you today?",
+        "Hi {name}, glad to see you here! I can help with booking flights or managing your travel plans. What do you need?",
+        "Welcome, {name}! I’m here to assist with all your travel needs. How can I help you today?",
+        "Greetings, {name}! Whether it’s booking flights or travel planning, I’ve got you covered. How may I assist?",
+        "Hey {name}, welcome aboard! I can help book flights or manage your travel plans. Let’s get started!",
+        "Hi {name}! Need help with a flight booking or managing your travel? I'm here to assist!"
+    ],
     "thanks": [
         "You're welcome! Happy to help.",
         "No problem at all!",
