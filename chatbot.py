@@ -3,29 +3,24 @@ from Classes.intent_matching import match_intent
 from Classes.booking_flow import booking_flow
 from Classes.database_setup import setup_database
 from Classes.sentiment_analysis import classify_sentiment
-
+from Classes.greeting import welcome_user
 
 # Identity management
-def get_user_name():
-    print("Bot: Hi, let's get started with your name: ")
-    return input("Enter your name: ")
 
 # Chatbot Main Loop
 def chatbot():
-    # Run the flights database setup once at the beginning
     setup_database()
-    
-    print("\nBot: Hello! Welcome to the Travel Booking Assistant.")
-    name = get_user_name()
-    print("Bot: You can ask me to book a flight, say hello, thank me, or say goodbye.")
+    name = None
     while True:
+        if(name == None):
+            name = welcome_user()
+
         user_input = input(f"{name}: ")
         intent = match_intent(user_input)
         
         if intent == "greeting":
             print(get_response("greeting", name=name))
         elif intent == "booking":
-            # Pass both name and user_input to booking_flow
             booking_flow(name, user_input)
         elif intent == "thanks":
             print(get_response("thanks", name=name))

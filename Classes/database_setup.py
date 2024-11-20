@@ -87,7 +87,7 @@ def setup_database():
         )
         ''')
         conn.commit()
-        print("Bookings table created successfully.")
+        # print("Bookings table created successfully.")
 
     # Generate new flight data
     flight_data = generate_flight_data()
@@ -102,7 +102,7 @@ def setup_database():
     VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', flight_data)
     conn.commit()
-    print("Flight data inserted successfully without duplicates.")
+    # print("Flight data inserted successfully without duplicates.")
 
     # Close the database connection
     conn.close()
