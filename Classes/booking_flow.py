@@ -89,13 +89,14 @@ def parse_booking_details(user_input, booking_details, name):
         details["departure_date"] = parse_date(user_input)
 
     # Print acknowledgment of parsed details
-    print("\nBot: Here's what I've understood so far:")
-    for key, value in details.items():
-        if value:
-            print(f" - {key.capitalize()}: {value}")
-        else:
-            print(f" - {key.capitalize()}: Not provided yet")
-    print("")
+    if(all(details.values())):
+        print("\nBot: Here's what I've understood so far:")
+        for key, value in details.items():
+            if value:
+                print(f" - {key.capitalize()}: {value}")
+            else:
+                print(f" - {key.capitalize()}: Not provided yet")
+        print("")
     return details
 
 # Helper function to parse dates from user input based on keywords
