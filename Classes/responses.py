@@ -99,14 +99,14 @@ responses = {
         "I'm here for you, {name}. Let me know how I can help make your day a little easier."
     ],
     "neutral_feelings": [
-    "Thanks for sharing, {name}. Let me know how I can help.",
-    "I hear you, {name}. How can I assist you today?",
-    "Got it, {name}. Let me know if there's anything I can do.",
-    "Thanks for letting me know, {name}. What can I help you with?",
-    "I appreciate you sharing, {name}. How can I assist you?",
-    "Alright, {name}. Let me know what you need help with.",
-    "Thank you for telling me, {name}. How can I support you today?"
-]
+        "Thanks for sharing, {name}. Let me know how I can help.",
+        "I hear you, {name}. How can I assist you today?",
+        "Got it, {name}. Let me know if there's anything I can do.",
+        "Thanks for letting me know, {name}. What can I help you with?",
+        "I appreciate you sharing, {name}. How can I assist you?",
+        "Alright, {name}. Let me know what you need help with.",
+        "Thank you for telling me, {name}. How can I support you today?"
+    ]
 }
 
 # Get a random response based on the intent and optional parameters
