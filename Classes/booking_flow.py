@@ -37,7 +37,6 @@ def parse_booking_details(user_input, booking_details, name):
         "origin": booking_details.get("origin"),
         "destination": booking_details.get("destination"),
         "departure_date": booking_details.get("departure_date"),
-        "return_date": booking_details.get("return_date"),
         "travel_class": booking_details.get("travel_class"),
     }
 
