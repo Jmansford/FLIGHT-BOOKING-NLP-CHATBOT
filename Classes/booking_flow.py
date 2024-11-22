@@ -148,7 +148,6 @@ def save_booking(conn, booking_details, name):
         booking_details["travel_class"]
     ))
     conn.commit()
-    print("Bot: Your booking has been saved successfully.")
 
 # PPrint out bookings for a specified user
 def display_bookings(name):
@@ -180,7 +179,7 @@ def display_and_cancel_booking(name):
     if not bookings:
         return
 
-    print("\nBot: Would you like to cancel one of your bookings? (yes/no)")
+    print("\nBot: Would you like to cancel your bookings? (yes/no)")
     confirm = input(f"{name}: ").strip().lower()
     if confirm not in ["yes", "y"]:
         print("Bot: No problem, let me know if you need anything else.")
