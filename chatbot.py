@@ -1,5 +1,5 @@
 from Classes.responses import get_response
-from Classes.intent_matching import match_intent
+from Classes.intent_matching import match_intent, find_answer
 from Classes.booking_flow import booking_flow, display_and_cancel_booking
 from Classes.database_setup import setup_database
 from Classes.sentiment_analysis import classify_sentiment
@@ -25,6 +25,11 @@ def chatbot():
 
         # Capture user input for processing.
         user_input = input(f"{name}: ")
+
+        answer = find_answer(user_input)
+        if answer:
+            print(f"Bot: {answer}")
+            continue
 
         # Determine the user's intent based on the input.
         intent = match_intent(user_input)

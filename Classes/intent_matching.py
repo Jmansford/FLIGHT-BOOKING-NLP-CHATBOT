@@ -1,13 +1,53 @@
 import json, re, nltk
+import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk.corpus import wordnet
+from nltk.corpus import wordnet, stopwords
 from nltk import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 nltk.download('wordnet', quiet = True)
 nltk.download('averaged_perceptron_tagger', quiet = True)
 nltk.download('punkt', quiet = True)
+nltk.download('stopwords', quiet = True)
+
+# Load the QA dataset
+qa_data = pd.read_csv('Resources/qa.csv')
+
+# Initialize stop words
+stop_words = set(stopwords.words('english'))
+
+# Preprocess questions and answers from the dataset
+def preprocess(text):
+    tokens = word_tokenize(text.lower())
+    filtered_tokens = [word for word in tokens if word.isalnum()]  # Only remove non-alphanumeric characters, keep all words
+    return ' '.join(filtered_tokens)
+
+qa_data['Processed_Question'] = qa_data['Question'].apply(preprocess)
+
+# TF-IDF for QA Dataset
+qa_vectorizer = TfidfVectorizer()
+tfidf_matrix = qa_vectorizer.fit_transform(qa_data['Processed_Question'])
+
+# Function to find the most similar answer based on cosine similarity
+def find_answer(question):
+    # Preprocess the user question
+    processed_question = preprocess(question)
+    user_tfidf = qa_vectorizer.transform([processed_question])  # Use the QA vectorizer here
+    
+    # Calculate cosine similarities between the user question and all dataset questions
+    similarities = cosine_similarity(user_tfidf, tfidf_matrix)
+    
+    # Find the index of the most similar question
+    max_similarity_index = similarities.argmax()
+    max_similarity_score = similarities[0, max_similarity_index]
+    
+    # Set a similarity threshold to ensure relevance
+    if max_similarity_score > 0.7:  
+        return qa_data.iloc[max_similarity_index]['Answer']
+    else:
+        return None  # Return None if no relevant answer is found
 
 
 lemmatizer = WordNetLemmatizer()
